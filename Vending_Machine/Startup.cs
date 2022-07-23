@@ -1,3 +1,5 @@
+using Application;
+using Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -5,11 +7,11 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MudBlazor.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Vending_Machine.Data;
 
 namespace Vending_Machine
 {
@@ -28,7 +30,9 @@ namespace Vending_Machine
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddMudServices();
+            services.AddInfrastructureLayer(Configuration.GetConnectionString("DefaultConnection"));
+            services.AddApplicationLayer();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
