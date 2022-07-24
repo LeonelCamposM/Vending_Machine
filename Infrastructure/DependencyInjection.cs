@@ -1,9 +1,6 @@
-﻿using Infrastructure.Persons;
-using Infrastructure.Persons.Repositories;
-using Domain.Persons.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-
+﻿using Microsoft.Extensions.DependencyInjection;
+using Domain.Products.Repositories;
+using Infrastructure.Products.Repositories;
 
 namespace Infrastructure
 {
@@ -11,8 +8,7 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContext<PersonDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
             return services;
         }
     }

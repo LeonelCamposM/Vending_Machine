@@ -1,20 +1,6 @@
-﻿@if (@IsLoading)
-{
-    <div class="d-flex justify-content-center text-primary">
-        <div class="spinner-border" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
-}
-else
-{
-    @ChildContent
-}
-
-@code {
-    [Parameter]
-    public bool IsLoading { get; set; }
-
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-}
+﻿
+<MudPaper  Height="220px" Width="100%" Outlined="false" Class="border-none pa-4" Elevation="0">
+    <MudText Align="Align.Center" Typo="Typo.h6">
+        <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+    </MudText>
+</MudPaper>
