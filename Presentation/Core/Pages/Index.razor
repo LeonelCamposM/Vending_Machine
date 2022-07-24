@@ -2,11 +2,14 @@
 @using Domain.Products.Entities
 @using Domain.Products.DTOs
 @using Presentation.Core.Components
+@using System.Threading;
+@using System.Globalization
 @inject IProductService ProductService
 @inject ISnackbar SnackBar
 @page "/"
 
 @if(!_loading){ 
+        <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @_totalCost.ToString(specifier, culture) </MudText>
         <MudTable @ref="@_table" Items="@_stock" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Filter="new Func<ProductDTO,bool>(FilterFunction)">
             <ToolBarContent>
                 <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="UpdateStock">Comprar </MudButton>
@@ -24,7 +27,13 @@
                     <MudTd DataLabel="Nombre">@context.name</MudTd>
                     <MudTd DataLabel="Unidades disponibles">@context.amount</MudTd>
                     <MudTd DataLabel="Unidades solicitadas">
-                         <MudNumericField @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text"  Min="0" Max="@context.amount" />
+                        @if(context.amount < context.requestedUnits){
+                            <MudNumericField  @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
+                         }
+                        else{
+                            <MudNumericField @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
+                        }
+                
                     </MudTd>
 
                 <MudTd DataLabel="Precio unitario"> ₡ @context.price</MudTd>
@@ -43,8 +52,11 @@
     private bool _loading = true;
     private string _searchString = "";
     private int _requestedUnits;
-    private int maxAmount = 0;
     private ProductDTO _selectedProduct;
+    private double _totalCost = 0;
+    private bool _inputError = false;
+    string specifier = "N";
+    public CultureInfo culture = CultureInfo.CreateSpecificCulture("es-ES");
 
 
     protected override void OnInitialized()
@@ -56,6 +68,7 @@
         }
         _stock = _stock.OrderBy(pay => pay.name).ToList();
         _loading = false;
+        UpdateTotalCost();
     }
 
     private void PageChanged(int i)
@@ -67,15 +80,52 @@
     {
         foreach (var product in _stock)
         {
-            if (product.requestedUnits != 0)
+            if (product.requestedUnits != 0 && !_inputError)
             {
                 product.amount -= product.requestedUnits;
                 product.requestedUnits = 0;
-                SnackBar.Add("Articulos comprados", Severity.Success);
+                SnackBar.Add("Compra realizada", Severity.Success);
             }   
         }
     }
-    
+
+    // refresh screen every 100ms
+    private async Task UpdateTotalCost()
+    {
+        while (true)
+        {
+            double cost = 0;
+            validateAmount();
+            if (!_inputError)
+            {
+                foreach (var product in _stock)
+                {
+                    cost += product.price * product.requestedUnits;
+                }
+                _totalCost = cost;
+            }
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(100);
+        }
+    }
+
+    private void validateAmount()
+    {
+        _inputError = false;
+        foreach (var product in _stock)
+        {
+            if (product.amount < product.requestedUnits)
+            {
+                _inputError = true;
+            }
+        }
+
+        if(_inputError == true)
+        {
+            SnackBar.Add("Se ha solicitado una cantidad de unidades errónea", Severity.Error);
+        }
+    }
+
     private bool FilterFunction(ProductDTO element) => Filter(element, _searchString);
     private bool Filter(ProductDTO element, string searchString)
     {
