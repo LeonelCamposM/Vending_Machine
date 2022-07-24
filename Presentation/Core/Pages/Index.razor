@@ -1,3 +1,25 @@
-﻿@page "/"
+﻿@using Application.Products
+@using Domain.Products.Entities
+@using Presentation.Core.Components
+@inject IProductService ProductService
+@page "/"
 
-Hello World
+@if(!_loading){
+    @foreach (var item in _stock)
+    {
+        <MudText>@item.name, @item.amount, @item.price</MudText>
+    }
+}else{
+    <Loading></Loading>
+}
+
+@code{
+    private IList<Product> _stock = new List<Product>();
+    private bool _loading = true;
+
+    protected override void OnInitialized()
+    {
+        _stock = ProductService.GetAvailableProducts();
+        _loading = false;
+    }
+}
