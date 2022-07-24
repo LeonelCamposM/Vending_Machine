@@ -9,10 +9,10 @@
 @page "/"
 
 @if(!_loading){ 
-        <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @_totalCost.ToString(specifier, culture) </MudText>
+        <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @ProductService.CostFormat(_totalCost) </MudText>
         <MudTable @ref="@_table" Items="@_stock" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Filter="new Func<ProductDTO,bool>(FilterFunction)">
             <ToolBarContent>
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="UpdateStock">Comprar </MudButton>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveTransaction">Comprar </MudButton>
                 <MudSpacer />
             <MudTextField @bind-Value="_searchString" Placeholder="Buscar refresco" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent> 
@@ -36,7 +36,7 @@
                 
                     </MudTd>
 
-                <MudTd DataLabel="Precio unitario"> ₡ @context.price</MudTd>
+                <MudTd  DataLabel="Precio unitario"> <MudText Align="Align.Right">  @ProductService.CostFormat(context.price) </MudText></MudTd>
             </RowTemplate>
         <PagerContent>
             <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
@@ -55,9 +55,6 @@
     private ProductDTO _selectedProduct;
     private double _totalCost = 0;
     private bool _inputError = false;
-    string specifier = "N";
-    public CultureInfo culture = CultureInfo.CreateSpecificCulture("es-ES");
-
 
     protected override void OnInitialized()
     {
@@ -66,7 +63,6 @@
         {
             _stock.Add(new ProductDTO(product.amount, product.price, product.name, 0));
         }
-        _stock = _stock.OrderBy(pay => pay.name).ToList();
         _loading = false;
         UpdateTotalCost();
     }
@@ -76,16 +72,12 @@
         _table.NavigateTo(i - 1);
     }
 
-    private void UpdateStock()
+    private void SaveTransaction()
     {
-        foreach (var product in _stock)
+        if (!_inputError)
         {
-            if (product.requestedUnits != 0 && !_inputError)
-            {
-                product.amount -= product.requestedUnits;
-                product.requestedUnits = 0;
-                SnackBar.Add("Compra realizada", Severity.Success);
-            }   
+            _stock = ProductService.UpdateStock(_stock);
+            SnackBar.Add("Compra realizada", Severity.Success);
         }
     }
 
@@ -94,44 +86,26 @@
     {
         while (true)
         {
-            double cost = 0;
-            validateAmount();
-            if (!_inputError)
+            _inputError = ProductService.ValidateRequestedUnits(_stock);
+            if (_inputError)
             {
-                foreach (var product in _stock)
-                {
-                    cost += product.price * product.requestedUnits;
-                }
-                _totalCost = cost;
+                 SnackBar.Add("Se ha solicitado una cantidad de unidades errónea", Severity.Error);
+            }
+            else
+            {
+                _totalCost = ProductService.UpdateTotalCost(_stock);
             }
             await InvokeAsync(StateHasChanged);
             await Task.Delay(100);
         }
     }
 
-    private void validateAmount()
-    {
-        _inputError = false;
-        foreach (var product in _stock)
-        {
-            if (product.amount < product.requestedUnits)
-            {
-                _inputError = true;
-            }
-        }
-
-        if(_inputError == true)
-        {
-            SnackBar.Add("Se ha solicitado una cantidad de unidades errónea", Severity.Error);
-        }
-    }
-
-    private bool FilterFunction(ProductDTO element) => Filter(element, _searchString);
-    private bool Filter(ProductDTO element, string searchString)
+    private bool FilterFunction(ProductDTO product) => Filter(product, _searchString);
+    private bool Filter(ProductDTO product, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.name.Contains(searchString))
+        if (product.name.Contains(searchString))
             return true;
         return false;
     }
