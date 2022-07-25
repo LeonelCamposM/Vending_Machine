@@ -1,6 +1,5 @@
 ﻿using Domain.Products.Repositories;
 using Domain.Products.Entities;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using Domain.Products.DTOs;
 using System;
@@ -63,7 +62,7 @@ namespace Application.Products.Implementations
         public string CostFormat(double cost)
         {
             double newCost = Math.Round(cost, 2);
-            string result = "₡ " + cost.ToString(specifier, culture);
+            string result = "₡ " + newCost.ToString(specifier, culture);
             result = result.Remove(result.Length() - 1);
             return result;
         }
