@@ -7,9 +7,5 @@ namespace Application.Products
     public interface IProductService
     {
         IList<Product> GetAvailableProducts();
-        bool ValidateRequestedUnits(IList<ProductDTO> stock);
-        IList<ProductDTO> UpdateStock(IList<ProductDTO> stock);
-        double UpdateTotalCost(IList<ProductDTO> stock);
-        string CostFormat(double cost);
     }
 }

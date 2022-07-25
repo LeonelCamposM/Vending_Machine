@@ -1,13 +1,14 @@
-﻿@using Presentation.Core.Components
-@using Presentation.Products.Models
+﻿@using Domain.Products.DTOs
+@using Presentation.Core.Components
 @using Application.Products
-
+@using Application.Inventory
 @inject IProductService ProductService
+@inject IInventoryService InventoryService
 @inject ISnackbar SnackBar
 
 <Overlay IsOpen="buyPressed">
         <MudPaper Class="align-left border-none"  Elevation="0" Outlined="false" Style="max-width: 60vw; width: 60vw; height: 43vw; overflow: auto; max-height: 95vh; ">
-            <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @ProductService.CostFormat(totalCost) </MudText>
+            <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(totalCost) </MudText>
             <MudTable @ref="@_table" Items="@_consumerPayment" Elevation="4" Outlined="true" Hover="true" Breakpoint="Breakpoint.Sm">
                 <ToolBarContent>
                     <MudButton Color="Color.Primary" OnClick="MakePayment" Variant="Variant.Filled">Realizar pago </MudButton>
@@ -20,15 +21,15 @@
                 </HeaderContent>
         
                 <RowTemplate>
-                        <MudTd DataLabel="Tipo de pago">@context.type</MudTd>
-                        <MudTd DataLabel="Valor">@context.value</MudTd>
+                        <MudTd DataLabel="Tipo de pago">@context.name</MudTd>
+                        <MudTd DataLabel="Valor">@context.price</MudTd>
                         <MudTd DataLabel="Unidades ingresadas">
-                            @if(context.enteredUnits < 0)
+                            @if(context.requestedUnits < 0)
                             {
-                                <MudNumericField Immediate="true" @bind-Value="context.enteredUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
+                                <MudNumericField Immediate="true" @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
                             }
                             else{
-                                <MudNumericField  Immediate="true" @bind-Value="context.enteredUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
+                                <MudNumericField  Immediate="true" @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
                             }
                         </MudTd>
                 </RowTemplate>
@@ -51,23 +52,22 @@
 
     private double consumerTotalPayment { get; set; }
 
-    private IList<Money> _consumerPayment = new List<Money>(){
-            new Money("Billete",1000,0),
-            new Money("Moneda",500,0),
-            new Money("Moneda",100,0),
-            new Money("Moneda",50,0),
-            new Money("Moneda",25,0),
+    private IList<ProductDTO> _consumerPayment = new List<ProductDTO>(){
+            new ProductDTO(0,1000,"Billete",0),
+            new ProductDTO(0,500,"Moneda",0),
+            new ProductDTO(0,100,"Moneda",0),
+            new ProductDTO(0,50,"Moneda",0),
+            new ProductDTO(0,25,"Moneda",0),
     };
 
-    private IList<Money> _changeBox = new List<Money>(){
-            new Money("Moneda",500,20),
-            new Money("Moneda",100,30),
-            new Money("Moneda",50,50),
-            new Money("Moneda",25,25),
-            new Money("Billete",1000,0),
+    private IList<ProductDTO> _changeBox = new List<ProductDTO>(){
+            new ProductDTO(20,500,"Moneda",0),
+            new ProductDTO(30,100,"Moneda",0),
+            new ProductDTO(50,50,"Moneda",0),
+            new ProductDTO(25,25,"Moneda",0),
     };
 
-    private MudTable<Money> _table;
+    private MudTable<ProductDTO> _table;
 
     private async Task SendConmuteSignal()
     {
@@ -76,11 +76,21 @@
 
     private void MakePayment()
     {
-        consumerTotalPayment = GetConsumerTotalPaymentt(_consumerPayment);
+        consumerTotalPayment = InventoryService.UpdateTotalCost(_consumerPayment);
         if (consumerTotalPayment >= totalCost)
         {
-            InitConsumerPayment();
-            updateStockState.InvokeAsync();
+            double changeBoxValue = InventoryService.GetFullInventoryCost(_changeBox);
+            double consumerChange = consumerTotalPayment - totalCost;
+            if (changeBoxValue >= consumerChange)
+            {
+                SnackBar.Add("Su vuelto es de "+InventoryService.CostFormat(consumerChange), Severity.Info);
+                InitConsumerPayment();
+                updateStockState.InvokeAsync();
+            }
+            else
+            {
+                SnackBar.Add("Fallo al realizar la compra, no hay cambio suficiente", Severity.Error);
+            }
         }
         else
         {
@@ -88,24 +98,14 @@
         }
     }
 
-    private double GetConsumerTotalPaymentt(IList<Money> consumerPayment)
-    {
-        double totalCost = 0;
-        foreach (var product in consumerPayment)
-        {
-            totalCost += product.value * product.enteredUnits;
-        }
-        return totalCost;
-    }
-
     private void InitConsumerPayment()
     {
-        _consumerPayment = new List<Money>(){
-            new Money("Billete",1000,0),
-            new Money("Moneda",500,0),
-            new Money("Moneda",100,0),
-            new Money("Moneda",50,0),
-            new Money("Moneda",25,0),
+        _consumerPayment = new List<ProductDTO>(){
+            new ProductDTO(0,1000,"Billete",0),
+            new ProductDTO(0,500,"Moneda",0),
+            new ProductDTO(0,100,"Moneda",0),
+            new ProductDTO(0,50,"Moneda",0),
+            new ProductDTO(0,25,"Moneda",0),
         };
     }
 }
