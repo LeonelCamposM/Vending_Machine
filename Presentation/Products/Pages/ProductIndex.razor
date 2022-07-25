@@ -14,7 +14,7 @@
 @if(!_loading){
         
        <CascadingValue Value="_totalCost">
-            <PaymentHandler buyPressed="_buyPressed" updateStockState="updateStock" conMuteOverlayState="conmuteOverlay"></PaymentHandler>
+            <PaymentHandler buyPressed="_buyPressed" updateStockState="_updateStock" conMuteOverlayState="_conmuteOverlay"></PaymentHandler>
        </CascadingValue> 
         <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(_totalCost) </MudText>
         <MudTable @ref="@_table" Items="@_stock" RowsPerPage="4" Elevation="4"  Hover="true" Breakpoint="Breakpoint.Sm" Filter="new Func<ProductDTO,bool>(FilterFunction)">
@@ -63,8 +63,8 @@
     private double _totalCost = 0;
     private bool _inputError = false;
     private bool _buyPressed = false;
-    public EventCallback conmuteOverlay => EventCallback.Factory.Create(this, ToggleBuyOverlay);
-    public EventCallback updateStock => EventCallback.Factory.Create(this, UpdateStock);
+    public EventCallback _conmuteOverlay => EventCallback.Factory.Create(this, ToggleBuyOverlay);
+    public EventCallback _updateStock => EventCallback.Factory.Create(this, UpdateStock);
 
     protected override void OnInitialized()
     {
@@ -77,9 +77,9 @@
         UpdateTotalCost();
     }
 
-    private void PageChanged(int i)
+    private void PageChanged(int index)
     {
-        _table.NavigateTo(i - 1);
+        _table.NavigateTo(index - 1);
     }
 
     private void SaveTransaction()

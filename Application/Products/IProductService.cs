@@ -1,5 +1,4 @@
-﻿using Domain.Products.DTOs;
-using Domain.Products.Entities;
+﻿using Domain.Products.Entities;
 using System.Collections.Generic;
 
 namespace Application.Products

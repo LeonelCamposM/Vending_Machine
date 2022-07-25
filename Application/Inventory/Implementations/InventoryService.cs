@@ -7,8 +7,8 @@ namespace Application.Inventory.Implementations
 {
     public class InventoryService : IInventoryService
     {
-        private string specifier = "N";
-        private CultureInfo culture = CultureInfo.CreateSpecificCulture("es-ES");
+        private readonly string _specifier = "N";
+        private readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture("es-ES");
 
         public InventoryService()
         {
@@ -53,7 +53,7 @@ namespace Application.Inventory.Implementations
         public string CostFormat(double cost)
         {
             double newCost = Math.Round(cost, 2);
-            string result = "₡ " + newCost.ToString(specifier, culture);
+            string result = "₡ " + newCost.ToString(_specifier, _culture);
             result = result.Remove(result.Length() - 1);
             return result;
         }

@@ -1,8 +1,11 @@
-﻿@using Domain.Products.DTOs
+﻿@using Domain.Money.Entities
+@using Domain.Products.DTOs
 @using Presentation.Core.Components
 @using Application.Products
 @using Application.Inventory
+@using Application.Money
 @inject IProductService ProductService
+@inject ICashService CashService
 @inject IInventoryService InventoryService
 @inject ISnackbar SnackBar
 
@@ -50,7 +53,9 @@
     [CascadingParameter]
     public double totalCost { get; set; }
 
-    private double consumerTotalPayment { get; set; }
+    private double _consumerTotalPayment { get; set; }
+
+    private IList<ProductDTO> _changeBox = new List<ProductDTO>();
 
     private IList<ProductDTO> _consumerPayment = new List<ProductDTO>(){
             new ProductDTO(0,1000,"Billete",0),
@@ -60,12 +65,14 @@
             new ProductDTO(0,25,"Moneda",0),
     };
 
-    private IList<ProductDTO> _changeBox = new List<ProductDTO>(){
-            new ProductDTO(20,500,"Moneda",0),
-            new ProductDTO(30,100,"Moneda",0),
-            new ProductDTO(50,50,"Moneda",0),
-            new ProductDTO(25,25,"Moneda",0),
-    };
+    protected override void OnInitialized()
+    {
+        IList<Cash> availableCash = CashService.GetAvailableCash();
+        foreach (var product in availableCash)
+        {
+            _changeBox.Add(new ProductDTO(product.amount, product.price, product.name, 0));
+        }
+    }
 
     private MudTable<ProductDTO> _table;
 
@@ -76,11 +83,11 @@
 
     private void MakePayment()
     {
-        consumerTotalPayment = InventoryService.UpdateTotalCost(_consumerPayment);
-        if (consumerTotalPayment >= totalCost)
+        _consumerTotalPayment = InventoryService.UpdateTotalCost(_consumerPayment);
+        if (_consumerTotalPayment >= totalCost)
         {
             double changeBoxValue = InventoryService.GetFullInventoryCost(_changeBox);
-            double consumerChange = consumerTotalPayment - totalCost;
+            double consumerChange = _consumerTotalPayment - totalCost;
             if (changeBoxValue >= consumerChange)
             {
                 SnackBar.Add("Su vuelto es de "+InventoryService.CostFormat(consumerChange), Severity.Info);
