@@ -8,7 +8,7 @@ using System.Globalization;
 
 namespace Application.Products.Implementations
 {
-    internal class ProductService : IProductService
+    public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
         private string specifier = "N";
