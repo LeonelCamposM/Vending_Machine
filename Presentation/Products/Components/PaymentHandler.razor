@@ -1,0 +1,111 @@
+﻿@using Presentation.Core.Components
+@using Presentation.Products.Models
+@using Application.Products
+
+@inject IProductService ProductService
+@inject ISnackbar SnackBar
+
+<Overlay IsOpen="buyPressed">
+        <MudPaper Class="align-left border-none"  Elevation="0" Outlined="false" Style="max-width: 60vw; width: 60vw; height: 43vw; overflow: auto; max-height: 95vh; ">
+            <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @ProductService.CostFormat(totalCost) </MudText>
+            <MudTable @ref="@_table" Items="@_consumerPayment" Elevation="4" Outlined="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                <ToolBarContent>
+                    <MudButton Color="Color.Primary" OnClick="MakePayment" Variant="Variant.Filled">Realizar pago </MudButton>
+                    <MudSpacer />
+                </ToolBarContent> 
+                <HeaderContent>
+                    <MudTh>Tipo de pago</MudTh>
+                    <MudTh>Valor</MudTh>
+                    <MudTh>Unidades ingresadas</MudTh>
+                </HeaderContent>
+        
+                <RowTemplate>
+                        <MudTd DataLabel="Tipo de pago">@context.type</MudTd>
+                        <MudTd DataLabel="Valor">@context.value</MudTd>
+                        <MudTd DataLabel="Unidades ingresadas">
+                            @if(context.enteredUnits < 0)
+                            {
+                                <MudNumericField Immediate="true" @bind-Value="context.enteredUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
+                            }
+                            else{
+                                <MudNumericField  Immediate="true" @bind-Value="context.enteredUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
+                            }
+                        </MudTd>
+                </RowTemplate>
+        </MudTable>
+        </MudPaper>
+        <MudItem xs="12" md="12" Style="width: 100%;" Class="d-flex justify-start">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SendConmuteSignal" Size="Size.Medium">Cerrar</MudButton>
+        </MudItem>
+</Overlay>
+
+@code {
+    [Parameter]
+    public bool buyPressed { get; set; }
+    [Parameter]
+    public EventCallback conMuteOverlayState { get; set; }
+    [Parameter]
+    public EventCallback updateStockState { get; set; }
+    [CascadingParameter]
+    public double totalCost { get; set; }
+
+    private double consumerTotalPayment { get; set; }
+
+    private IList<Money> _consumerPayment = new List<Money>(){
+            new Money("Billete",1000,0),
+            new Money("Moneda",500,0),
+            new Money("Moneda",100,0),
+            new Money("Moneda",50,0),
+            new Money("Moneda",25,0),
+    };
+
+    private IList<Money> _changeBox = new List<Money>(){
+            new Money("Moneda",500,20),
+            new Money("Moneda",100,30),
+            new Money("Moneda",50,50),
+            new Money("Moneda",25,25),
+            new Money("Billete",1000,0),
+    };
+
+    private MudTable<Money> _table;
+
+    private async Task SendConmuteSignal()
+    {
+        await conMuteOverlayState.InvokeAsync();
+    }
+
+    private void MakePayment()
+    {
+        consumerTotalPayment = GetConsumerTotalPaymentt(_consumerPayment);
+        if (consumerTotalPayment >= totalCost)
+        {
+            InitConsumerPayment();
+            updateStockState.InvokeAsync();
+        }
+        else
+        {
+            SnackBar.Add("El monto ingresado es insuficiente, inténtelo de nuevo", Severity.Error);
+        }
+    }
+
+    private double GetConsumerTotalPaymentt(IList<Money> consumerPayment)
+    {
+        double totalCost = 0;
+        foreach (var product in consumerPayment)
+        {
+            totalCost += product.value * product.enteredUnits;
+        }
+        return totalCost;
+    }
+
+    private void InitConsumerPayment()
+    {
+        _consumerPayment = new List<Money>(){
+            new Money("Billete",1000,0),
+            new Money("Moneda",500,0),
+            new Money("Moneda",100,0),
+            new Money("Moneda",50,0),
+            new Money("Moneda",25,0),
+        };
+    }
+}
