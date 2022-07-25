@@ -16,7 +16,7 @@ namespace Infrastructure.Products.Repositories
 
         public IList<Product> GetAvailableProducts()
         {
-            IList<Product> availableProducts = _dbContext.Products.ToList();
+            IList<Product> availableProducts = _dbContext.Products.OrderBy(product => product.name).ToList();
             return availableProducts;
         }
     }

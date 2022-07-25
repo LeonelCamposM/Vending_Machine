@@ -2,14 +2,17 @@
 @using Domain.Products.Entities
 @using Domain.Products.DTOs
 @using Presentation.Core.Components
+@using System.Threading;
+@using System.Globalization
 @inject IProductService ProductService
 @inject ISnackbar SnackBar
 @page "/"
 
 @if(!_loading){ 
-        <MudTable @ref="@_table" Items="@_stock" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" Filter="new Func<ProductDTO,bool>(FilterFunction)">
+        <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @ProductService.CostFormat(_totalCost) </MudText>
+        <MudTable @ref="@_table" Items="@_stock" RowsPerPage="4" Elevation="4"  Hover="true" Breakpoint="Breakpoint.Sm" Filter="new Func<ProductDTO,bool>(FilterFunction)">
             <ToolBarContent>
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="UpdateStock">Comprar </MudButton>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveTransaction">Comprar </MudButton>
                 <MudSpacer />
             <MudTextField @bind-Value="_searchString" Placeholder="Buscar refresco" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent> 
@@ -24,10 +27,16 @@
                     <MudTd DataLabel="Nombre">@context.name</MudTd>
                     <MudTd DataLabel="Unidades disponibles">@context.amount</MudTd>
                     <MudTd DataLabel="Unidades solicitadas">
-                         <MudNumericField @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text"  Min="0" Max="@context.amount" />
+                        @if(context.amount < context.requestedUnits){
+                            <MudNumericField  @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
+                         }
+                        else{
+                            <MudNumericField @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
+                        }
+                
                     </MudTd>
 
-                <MudTd DataLabel="Precio unitario"> ₡ @context.price</MudTd>
+                <MudTd  DataLabel="Precio unitario"> <MudText Align="Align.Right">  @ProductService.CostFormat(context.price) </MudText></MudTd>
             </RowTemplate>
         <PagerContent>
             <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
@@ -43,9 +52,9 @@
     private bool _loading = true;
     private string _searchString = "";
     private int _requestedUnits;
-    private int maxAmount = 0;
     private ProductDTO _selectedProduct;
-
+    private double _totalCost = 0;
+    private bool _inputError = false;
 
     protected override void OnInitialized()
     {
@@ -54,8 +63,8 @@
         {
             _stock.Add(new ProductDTO(product.amount, product.price, product.name, 0));
         }
-        _stock = _stock.OrderBy(pay => pay.name).ToList();
         _loading = false;
+        UpdateTotalCost();
     }
 
     private void PageChanged(int i)
@@ -63,25 +72,40 @@
         _table.NavigateTo(i - 1);
     }
 
-    private void UpdateStock()
+    private void SaveTransaction()
     {
-        foreach (var product in _stock)
+        if (!_inputError)
         {
-            if (product.requestedUnits != 0)
-            {
-                product.amount -= product.requestedUnits;
-                product.requestedUnits = 0;
-                SnackBar.Add("Articulos comprados", Severity.Success);
-            }   
+            _stock = ProductService.UpdateStock(_stock);
+            SnackBar.Add("Compra realizada", Severity.Success);
         }
     }
-    
-    private bool FilterFunction(ProductDTO element) => Filter(element, _searchString);
-    private bool Filter(ProductDTO element, string searchString)
+
+    // refresh screen every 100ms
+    private async Task UpdateTotalCost()
+    {
+        while (true)
+        {
+            _inputError = ProductService.ValidateRequestedUnits(_stock);
+            if (_inputError)
+            {
+                 SnackBar.Add("Se ha solicitado una cantidad de unidades errónea", Severity.Error);
+            }
+            else
+            {
+                _totalCost = ProductService.UpdateTotalCost(_stock);
+            }
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(100);
+        }
+    }
+
+    private bool FilterFunction(ProductDTO product) => Filter(product, _searchString);
+    private bool Filter(ProductDTO product, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.name.Contains(searchString))
+        if (product.name.Contains(searchString))
             return true;
         return false;
     }
