@@ -12,43 +12,48 @@
 @page "/home"
 
 @if(!_loading){
-        
-       <CascadingValue Value="_totalCost">
+    if (_buyPressed)
+    {
+        <CascadingValue Value="_totalCost">
             <PaymentHandler buyPressed="_buyPressed" updateStockState="_updateStock" conMuteOverlayState="_conmuteOverlay"></PaymentHandler>
-       </CascadingValue> 
+        </CascadingValue> 
+    }
+    else
+    {
         <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(_totalCost) </MudText>
         <MudTable @ref="@_table" Items="@_stock" RowsPerPage="4" Elevation="4"  Hover="true" Breakpoint="Breakpoint.Sm" Filter="new Func<ProductDTO,bool>(FilterFunction)">
-            <ToolBarContent>
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveTransaction">Comprar </MudButton>
-                <MudSpacer />
-            <MudTextField @bind-Value="_searchString" Placeholder="Buscar refresco" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent> 
-            <HeaderContent>
-                <MudTh>Nombre</MudTh>
-                <MudTh>Unidades disponibles</MudTh>
-                <MudTh>Unidades solicitadas</MudTh>
-                <MudTh>Precio unitario</MudTh>
-            </HeaderContent>
+                <ToolBarContent>
+                    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveTransaction">Comprar </MudButton>
+                    <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Buscar refresco" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent> 
+                <HeaderContent>
+                    <MudTh>Nombre</MudTh>
+                    <MudTh>Unidades disponibles</MudTh>
+                    <MudTh>Unidades solicitadas</MudTh>
+                    <MudTh>Precio unitario</MudTh>
+                </HeaderContent>
         
-            <RowTemplate>
-                    <MudTd DataLabel="Nombre">@context.name</MudTd>
-                    <MudTd DataLabel="Unidades disponibles">@context.amount</MudTd>
-                    <MudTd DataLabel="Unidades solicitadas">
-                        @if(context.amount < context.requestedUnits){
-                            <MudNumericField Immediate="true" @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
-                         }
-                        else{
-                            <MudNumericField  Immediate="true" @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
-                        }
+                <RowTemplate>
+                        <MudTd DataLabel="Nombre">@context.name</MudTd>
+                        <MudTd DataLabel="Unidades disponibles">@context.amount</MudTd>
+                        <MudTd DataLabel="Unidades solicitadas">
+                            @if(context.amount < context.requestedUnits){
+                                <MudNumericField Immediate="true" @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
+                            }
+                            else{
+                                <MudNumericField  Immediate="true" @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
+                            }
                 
-                    </MudTd>
+                        </MudTd>
 
-                <MudTd  DataLabel="Precio unitario"> <MudText Align="Align.Right">  @InventoryService.CostFormat(context.price) </MudText></MudTd>
-            </RowTemplate>
-        <PagerContent>
-            <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
-        </PagerContent>
-    </MudTable>
+                    <MudTd  DataLabel="Precio unitario"> <MudText Align="Align.Right">  @InventoryService.CostFormat(context.price) </MudText></MudTd>
+                </RowTemplate>
+            <PagerContent>
+                <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+            </PagerContent>
+        </MudTable>
+    }
 }else{
     <Loading />
 }
@@ -120,7 +125,7 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (product.name.Contains(searchString))
+        if (product.name.ToLower().Contains(searchString.ToLower()))
             return true;
         return false;
     }
