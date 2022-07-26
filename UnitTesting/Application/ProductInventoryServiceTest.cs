@@ -9,7 +9,7 @@ namespace UnitTesting.Application.ProductInventoryServiceTests
 {
     public class ProductInventoryServiceTests
     {
-        ProductInventoryService inventoryService = new ProductInventoryService();
+        readonly ProductInventoryService inventoryService = new();
 
         [Fact]
         public void UpdateStock()

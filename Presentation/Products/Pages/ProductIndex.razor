@@ -12,22 +12,22 @@
 @inject ISnackbar SnackBar
 @page "/Home"
 
-@if(!_pageState.loading){
-    if (_pageState.buyPressed)
+@if(!_pageState.Loading){
+    if (_pageState.BuyPressed)
     {
-        <CascadingValue Value="_pageState.totalCost">
-            <PaymentHandler buyPressed="_pageState.buyPressed" updateStockState="_saveTransaction" conMuteOverlayState="_conmuteOverlay"></PaymentHandler>
+        <CascadingValue Value="_pageState.TotalCost">
+            <PaymentHandler buyPressed="_pageState.BuyPressed" saveTransactionState="_saveTransaction" conMuteOverlayState="_conmuteOverlay"></PaymentHandler>
         </CascadingValue> 
     }
     else
     {
-        <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(_pageState.totalCost) </MudText>
-        <MudTable @ref="@_pageState.table" Items="@_pageState.inventory" RowsPerPage="4" Elevation="4"  Hover="true" Breakpoint="Breakpoint.Sm" Filter="new Func<ProductDTO,bool>(FilterFunction)">
+        <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(_pageState.TotalCost) </MudText>
+        <MudTable @ref="@_pageState.Table" Items="@_pageState.Inventory" RowsPerPage="4" Elevation="4"  Hover="true" Breakpoint="Breakpoint.Sm" Filter="new Func<ProductDTO,bool>(FilterFunction)">
                
             <ToolBarContent>
                 <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="BeginTransaction">Comprar </MudButton>
                 <MudSpacer />
-            <MudTextField @bind-Value="_pageState.searchString" Placeholder="Buscar refresco" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="_pageState.SearchString" Placeholder="Buscar refresco" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent> 
 
             <HeaderContent>
@@ -47,7 +47,7 @@
             </RowTemplate>
 
             <PagerContent>
-                <MudPagination SelectedChanged="PageChanged" Count="@((_pageState.table.GetFilteredItemsCount() + _pageState.table.RowsPerPage - 1) / _pageState.table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
+                <MudPagination SelectedChanged="PageChanged" Count="@((_pageState.Table.GetFilteredItemsCount() + _pageState.Table.RowsPerPage - 1) / _pageState.Table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
             </PagerContent>
 
         </MudTable>
@@ -58,8 +58,8 @@
 
 @code{
     private ProductIndexState _pageState = new ProductIndexState();
-    public EventCallback _conmuteOverlay => EventCallback.Factory.Create(this, ToggleBuyOverlay);
-    public EventCallback _saveTransaction => EventCallback.Factory.Create(this, SaveTransaction);
+    private EventCallback _conmuteOverlay => EventCallback.Factory.Create(this, ToggleBuyOverlay);
+    private EventCallback _saveTransaction => EventCallback.Factory.Create(this, SaveTransaction);
 
     protected override void OnInitialized()
     {
@@ -71,21 +71,21 @@
         IList<Product> availableProducts = ProductService.GetAvailableProducts();
         foreach (var product in availableProducts)
         {
-            _pageState.inventory.Add(new ProductDTO(product.Amount, product.Price, product.Name, 0));
+            _pageState.Inventory.Add(new ProductDTO(product.Amount, product.Price, product.Name, 0));
         }
-        InventoryService.SetInventory(_pageState.inventory);
-        _pageState.loading = false;
+        InventoryService.SetInventory(_pageState.Inventory);
+        _pageState.Loading = false;
         UpdateTotalCost();
     }
 
     private void PageChanged(int index)
     {
-        _pageState.table.NavigateTo(index - 1);
+        _pageState.Table.NavigateTo(index - 1);
     }
 
     private void BeginTransaction()
     {
-        _pageState.buyPressed = true;
+        _pageState.BuyPressed = true;
     }
 
     // refresh screen every 100ms
@@ -93,32 +93,32 @@
     {
         while (true)
         {
-            _pageState.totalCost = InventoryService.UpdateTotalCost();
+            _pageState.TotalCost = InventoryService.UpdateTotalCost();
             await InvokeAsync(StateHasChanged);
             await Task.Delay(100);
         }
     }
 
-    private bool FilterFunction(ProductDTO product) => Filter(product, _pageState.searchString);
-    private bool Filter(ProductDTO product, string searchString)
+    private bool FilterFunction(ProductDTO product) => Filter(product, _pageState.SearchString);
+    private bool Filter(ProductDTO product, string SearchString)
     {
-        if (string.IsNullOrWhiteSpace(searchString))
+        if (string.IsNullOrWhiteSpace(SearchString))
             return true;
-        if (product.Name.ToLower().Contains(searchString.ToLower()))
+        if (product.Name.ToLower().Contains(SearchString.ToLower()))
             return true;
         return false;
     }
 
     private void ToggleBuyOverlay()
     {
-        _pageState.buyPressed = !_pageState.buyPressed;
+        _pageState.BuyPressed = !_pageState.BuyPressed;
     }
 
     private void SaveTransaction() 
     {
-        _pageState.inventory = InventoryService.UpdateInventory();
+        _pageState.Inventory = InventoryService.UpdateInventory();
         IList<Product> availableProducts = new List<Product>();
-        foreach (var product in _pageState.inventory)
+        foreach (var product in _pageState.Inventory)
         {
             availableProducts.Add(new Product(product.Amount, product.Price, product.Name));
         }

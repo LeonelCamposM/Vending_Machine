@@ -4,12 +4,13 @@ using FluentAssertions;
 using Xunit;
 using Application.CashInventory;
 using Domain.Money.DTOs;
+using Domain.Money.Entities;
 
 namespace UnitTesting.Application.ProductInventoryServiceTests
 {
     public class CashInventoryServiceTests
     {
-        CashInventoryService inventoryService = new CashInventoryService();
+        readonly CashInventoryService inventoryService = new();
 
         [Fact]
         public void UpdateStock()
@@ -94,7 +95,7 @@ namespace UnitTesting.Application.ProductInventoryServiceTests
             inventoryService.SetInventory(stock);
 
             // act 
-            IList <CashDTO>  change = inventoryService.GetPaymentChange(3500);
+            IList <Cash>  change = inventoryService.GetPaymentChange(3500);
 
             //// assert
             change.Length().Should().Be(7);

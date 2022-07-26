@@ -6,12 +6,12 @@ namespace Presentation.Products.Models
 {
     public class ProductIndexState
     {
-        public IList<ProductDTO> inventory = new List<ProductDTO>();
-        public MudTable<ProductDTO> table;
-        public bool loading = true;
-        public string searchString = "";
-        public double totalCost = 0;
-        public bool buyPressed = false;
+        public IList<ProductDTO> Inventory = new List<ProductDTO>();
+        public MudTable<ProductDTO> Table;
+        public bool Loading = true;
+        public string SearchString = "";
+        public double TotalCost = 0;
+        public bool BuyPressed = false;
 
         public ProductIndexState()
         {

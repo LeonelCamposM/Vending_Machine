@@ -2,6 +2,7 @@
 using Application.AbstractInventory.Implementations;
 using System.Linq;
 using Domain.Money.DTOs;
+using Domain.Money.Entities;
 
 namespace Application.CashInventory
 {
@@ -40,7 +41,7 @@ namespace Application.CashInventory
             inventory.ElementAt(index).RequestedUnits = newUnits;
         }
 
-        public IList<CashDTO> GetPaymentChange(double payment)
+        public IList<Cash> GetPaymentChange(double payment)
         {
             inventory = inventory.OrderByDescending(cash => cash.Price).ToList();
             IList <CashDTO> result = new List<CashDTO>();
@@ -49,9 +50,7 @@ namespace Application.CashInventory
             while(index < inventory.Count)
             {
                 if (currentChange == payment)
-                {
                     break;
-                }
                 CashDTO currency = inventory[index];
                 bool usable = ValidateCurrencyUsability(index, payment, currentChange);
                 if (usable)
@@ -64,7 +63,8 @@ namespace Application.CashInventory
                     index += 1;
                 }
             }
-            return result;
+            IList<Cash> groupedChange = GroupChange(result);
+            return groupedChange;
         }
 
         private bool ValidateCurrencyUsability(int index, double payment, double currentChange)
@@ -79,6 +79,21 @@ namespace Application.CashInventory
                 usable = true;
             }
             return usable;
+        }
+
+        private static IList<Cash> GroupChange(IList<CashDTO> consumerChange)
+        {
+            IList<Cash> groupedChange = new List<Cash>();
+            var GroupedChange =
+                            from cash in consumerChange
+                            group cash by cash.Price;
+
+            foreach (var cashGroup in GroupedChange)
+            {
+                var cash = cashGroup.FirstOrDefault();
+                groupedChange.Add(new Cash(cashGroup.Count(), cash.Price, cash.Name));
+            }
+            return groupedChange;
         }
 
         public override IList<CashDTO> GetInventory()

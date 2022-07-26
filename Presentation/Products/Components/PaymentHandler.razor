@@ -5,71 +5,36 @@
 @using Application.Products
 @using Application.Money
 @using Application.CashInventory
+@using Presentation.Products.Models
 @inject IProductService ProductService
 @inject ICashService CashService
 @inject ICashInventoryService InventoryService
 @inject ISnackbar SnackBar
 
-<MudDialog @bind-IsVisible="_succesfulPurchase">
-    <TitleContent>
-        <MudText Typo="Typo.h6">
-            Su vuelto es de: @InventoryService.CostFormat(_finalChange)
-        </MudText>
-    </TitleContent>
-    <DialogContent>
-        <MudTreeView ExpandOnClick="true" T="string">
-            <MudTreeViewItem  Value="@("Desglose de cambio")">
-                @foreach (var item in _consumerChange)
-                {
-                    @if (item.Amount > 1)
-                    {
-                        <MudTreeViewItem Value="@(item.Amount+" "+item.Name+"s de "+item.Price)" />
-                    }
-                    else
-                    {
-                        <MudTreeViewItem Value="@(item.Amount+" "+item.Name +" de "+item.Price)" />
-                    }
-                }
-            </MudTreeViewItem>
-        </MudTreeView>
-    </DialogContent>
-    <DialogActions>
-        <MudButton  Variant="Variant.Filled" Color="Color.Primary" OnClick="TogglesuccesfulPurchase" Class="px-10">Aceptar</MudButton>
-        <MudSpacer/>
-        <MudButton Disabled="true"/>
-    </DialogActions>
- </MudDialog>
-
+<PaymentSummaryDialog consumerChange="_pageState.ConsumerChange" finalChange="_pageState.FinalChange" toggleDialogState="_ToggleDialog"  succesfulPurchase="_pageState.SuccesfulPurchase"/>
 <Overlay IsOpen="buyPressed">
-        <MudPaper Class="align-left border-none"  Elevation="0" Style="max-width: 60vw; width: 60vw; height: 43vw; overflow: auto; max-height: 95vh; ">
-            <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(totalCost) </MudText>
-            <MudTable @ref="@_table" Items="@_consumerPayment" Elevation="6" Outlined="true" Hover="true" Breakpoint="Breakpoint.Sm">
-                <ToolBarContent>
-                    <MudButton Color="Color.Primary" OnClick="MakePayment" Variant="Variant.Filled">Realizar pago </MudButton>
-                    <MudSpacer />
-                    <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="SendConmuteSignal" Size="Size.Medium">Cancelar</MudButton>
-                </ToolBarContent> 
-                <HeaderContent>
-                    <MudTh>Tipo de pago</MudTh>
-                    <MudTh>Valor</MudTh>
-                    <MudTh>Unidades ingresadas</MudTh>
-                </HeaderContent>
+    <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(totalCost) </MudText>
+    <MudTable @ref="@_pageState.Table" Items="@_pageState.ConsumerPayment" Elevation="6" Outlined="true" Hover="true" Breakpoint="Breakpoint.Sm">
+        <ToolBarContent>
+            <MudButton Color="Color.Primary" Size="Size.Small" OnClick="ValidatePayment" Variant="Variant.Filled">Realizar pago </MudButton>
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="SendConmuteSignal" Size="Size.Small">Cancelar</MudButton>
+        </ToolBarContent> 
+
+        <HeaderContent>
+            <MudTh>Tipo de pago</MudTh>
+            <MudTh>Valor</MudTh>
+            <MudTh>Unidades ingresadas</MudTh>
+        </HeaderContent>
         
-                <RowTemplate>
-                        <MudTd DataLabel="Tipo de pago">@context.Name</MudTd>
-                        <MudTd DataLabel="Valor">@context.Price</MudTd>
-                        <MudTd DataLabel="Unidades ingresadas">
-                            @if(context.RequestedUnits < 0)
-                            {
-                                <MudNumericField Immediate="true" @bind-Value="context.RequestedUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
-                            }
-                            else{
-                                <MudNumericField  Immediate="true" @bind-Value="context.RequestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
-                            }
-                        </MudTd>
-                </RowTemplate>
-        </MudTable>
-        </MudPaper>
+        <RowTemplate>
+            <MudTd DataLabel="Tipo de pago">@context.Name</MudTd>
+            <MudTd DataLabel="Valor">@context.Price</MudTd>
+            <MudTd DataLabel="Unidades ingresadas">
+                <MudNumericField  Immediate="true" @bind-Value="context.RequestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
 </Overlay>
 
 @code {
@@ -78,63 +43,38 @@
     [Parameter]
     public EventCallback conMuteOverlayState { get; set; }
     [Parameter]
-    public EventCallback updateStockState { get; set; }
+    public EventCallback saveTransactionState { get; set; }
     [CascadingParameter]
     public double totalCost { get; set; }
-    private double _consumerTotalPayment { get; set; }
-    private IList<CashDTO> _changeBox = new List<CashDTO>();
-    private IList<CashDTO> _consumerPayment = new List<CashDTO>(){
-            new CashDTO(0,1000,"Billete",0),
-            new CashDTO(0,500,"Moneda",0),
-            new CashDTO(0,100,"Moneda",0),
-            new CashDTO(0,50,"Moneda",0),
-            new CashDTO(0,25,"Moneda",0),
-    };
-    private MudTable<CashDTO> _table;
-    private bool _succesfulPurchase = false;
-    private IList<Cash> _consumerChange = new List<Cash>();
-    private double _finalChange = 0;
+    private EventCallback _ToggleDialog => EventCallback.Factory.Create(this, TogglesuccesfulPurchase);
+    private PaymentHandlerState _pageState = new PaymentHandlerState();
 
     protected override void OnInitialized()
+    {
+        LoadAvailableCash();
+    } 
+
+    private void LoadAvailableCash()
     {
         IList<Cash> availableCash = CashService.GetAvailableCash();
         foreach (var product in availableCash)
         {
-            _changeBox.Add(new CashDTO(product.Amount, product.Price, product.Name, 0));
+            _pageState.ChangeBox.Add(new CashDTO(product.Amount, product.Price, product.Name, 0));
         }
-    }  
+    }
 
     private async Task SendConmuteSignal()
     {
         await conMuteOverlayState.InvokeAsync();
     }
 
-    private void MakePayment()
+    private void ValidatePayment()
     {
-        InventoryService.SetInventory(_consumerPayment);
-        _consumerTotalPayment = InventoryService.UpdateTotalCost();
-        if (_consumerTotalPayment >= totalCost)
+        InventoryService.SetInventory(_pageState.ConsumerPayment);
+        _pageState.ConsumerTotalPayment = InventoryService.UpdateTotalCost();
+        if (_pageState.ConsumerTotalPayment >= totalCost)
         {
-            InventoryService.SetInventory(_changeBox);
-            double changeBoxValue = InventoryService.GetFullInventoryCost();
-            double consumerChange = _consumerTotalPayment - totalCost;
-            if (changeBoxValue >= consumerChange)
-            {
-                _finalChange = consumerChange;
-                var result = InventoryService.GetPaymentChange(consumerChange);
-                GroupChange(result);
-                IList<Cash>  availableCash =  new List<Cash>();
-                foreach (var product in InventoryService.GetInventory())
-                {
-                    availableCash.Add(new Cash(product.Amount, product.Price, product.Name));
-                }
-                CashService.UpdateAvailableCash(availableCash);
-                _succesfulPurchase = true;
-            }
-            else
-            {
-                SnackBar.Add("Fallo al realizar la compra, no hay cambio suficiente", Severity.Error);
-            }
+            MakePayment();
         }
         else
         {
@@ -142,36 +82,37 @@
         }
     }
 
-    private void InitConsumerPayment()
+    private void MakePayment()
     {
-        _consumerPayment = new List<CashDTO>(){
-            new CashDTO(0,1000,"Billete",0),
-            new CashDTO(0,500,"Moneda",0),
-            new CashDTO(0,100,"Moneda",0),
-            new CashDTO(0,50,"Moneda",0),
-            new CashDTO(0,25,"Moneda",0),
-        };
+        InventoryService.SetInventory(_pageState.ChangeBox);
+        double changeBoxValue = InventoryService.GetFullInventoryCost();
+        double ConsumerChange = _pageState.ConsumerTotalPayment - totalCost;
+        if (changeBoxValue >= ConsumerChange)
+        {
+            _pageState.FinalChange = ConsumerChange;
+            _pageState.ConsumerChange = InventoryService.GetPaymentChange(ConsumerChange);
+            UpdateAvailableCash();
+            _pageState.SuccesfulPurchase = true;
+        }
+        else
+        {
+            SnackBar.Add("Fallo al realizar la compra, no hay cambio suficiente", Severity.Error);
+        }
     }
 
     private void TogglesuccesfulPurchase()
     {
-        _succesfulPurchase = false;
-        InvokeAsync(StateHasChanged);
-        _consumerChange = new List<Cash>();
-        InitConsumerPayment();
-        updateStockState.InvokeAsync();
+        _pageState = new PaymentHandlerState();
+        saveTransactionState.InvokeAsync();
     }
 
-    private void GroupChange(IList<CashDTO> consumerChange)
+    private void UpdateAvailableCash()
     {
-        var GroupedChange = 
-                        from cash in consumerChange
-                        group cash by cash.Price;
-
-        foreach (var cashGroup in GroupedChange)
+        IList<Cash>  availableCash =  new List<Cash>();
+        foreach (var product in InventoryService.GetInventory())
         {
-            var cash = cashGroup.FirstOrDefault();
-            _consumerChange.Add(new Cash(cashGroup.Count(), cash.Price, cash.Name));
+            availableCash.Add(new Cash(product.Amount, product.Price, product.Name));
         }
+        CashService.UpdateAvailableCash(availableCash);
     }
 }

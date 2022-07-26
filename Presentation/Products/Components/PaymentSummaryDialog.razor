@@ -1,0 +1,51 @@
+﻿@using Domain.Money.Entities
+@using Application.CashInventory
+@inject ICashInventoryService InventoryService
+
+<MudDialog @bind-IsVisible="succesfulPurchase">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Su vuelto es de: @InventoryService.CostFormat(finalChange)
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTreeView ExpandOnClick="true" T="string">
+            <MudTreeViewItem  Value="@("Desglose de cambio")">
+                @foreach (var item in consumerChange)
+                {
+                    @if (item.Amount > 1)
+                    {
+                        <MudTreeViewItem Value="@(item.Amount+" "+item.Name+"s de "+item.Price)" />
+                    }
+                    else
+                    {
+                        <MudTreeViewItem Value="@(item.Amount+" "+item.Name +" de "+item.Price)" />
+                    }
+                }
+            </MudTreeViewItem>
+        </MudTreeView>
+    </DialogContent>
+    <DialogActions>
+        <MudButton  Variant="Variant.Filled" Color="Color.Primary" OnClick="TogglesuccesfulPurchase" Class="px-10">Aceptar</MudButton>
+        <MudSpacer/>
+        <MudButton Disabled="true"/>
+    </DialogActions>
+ </MudDialog>
+
+@code {
+    [Parameter]
+    public IList<Cash> consumerChange { get; set; }
+    [Parameter]
+    public double finalChange { get; set; }
+    [Parameter]
+    public bool succesfulPurchase { get; set; }
+    [Parameter]
+    public EventCallback toggleDialogState { get; set; }
+
+    private void TogglesuccesfulPurchase()
+    {
+        succesfulPurchase = false;
+        InvokeAsync(StateHasChanged);
+        toggleDialogState.InvokeAsync();
+    }
+}
