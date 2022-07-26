@@ -5,7 +5,6 @@ namespace Application.CashInventory
 {
     public interface ICashInventoryService
     {
-        public bool ValidateRequestedUnits();
         public IList<CashDTO> UpdateInventory();
         public double UpdateTotalCost();
         public string CostFormat(double cost);

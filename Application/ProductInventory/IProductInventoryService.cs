@@ -5,7 +5,6 @@ namespace Application.ProductInventory
 {
     public interface IProductInventoryService
     {
-        public bool ValidateRequestedUnits();
         public IList<ProductDTO> UpdateInventory();
         public double UpdateTotalCost();
         public string CostFormat(double cost);

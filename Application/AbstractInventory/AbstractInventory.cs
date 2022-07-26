@@ -14,22 +14,6 @@ namespace Application.AbstractInventory.Implementations
         {
         }
 
-        public bool ValidateRequestedUnits()
-        {
-            bool inputError = false;
-            int index = 0;
-            foreach (var product in inventory)
-            {
-                if (GetItemAmount(index) < GetRequestedUnits(index))
-                {
-                    inputError = true;
-                    break;
-                }
-                index += 1;
-            }
-            return inputError;
-        }
-
         public IList<T> UpdateInventory()
         {
             int index = 0;

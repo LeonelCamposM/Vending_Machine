@@ -12,42 +12,6 @@ namespace UnitTesting.Application.ProductInventoryServiceTests
         CashInventoryService inventoryService = new CashInventoryService();
 
         [Fact]
-        public void ValidRequestedUnits()
-        {
-            // arrange
-            IList<CashDTO> stock = new List<CashDTO>(){
-                new CashDTO(10,500,"moneda", 1),
-                new CashDTO(10,50,"moneda", 2),
-                new CashDTO(10,25,"moneda", 3),
-            };
-            inventoryService.SetInventory(stock);
-
-            // act 
-            bool error = inventoryService.ValidateRequestedUnits();
-
-            // assert
-            error.Should().BeFalse();
-        }
-
-        [Fact]
-        public void InvalidRequestedUnits()
-        {
-            // arrange
-            IList<CashDTO> stock = new List<CashDTO>(){
-                new CashDTO(10,500,"moneda", 1),
-                new CashDTO(10,50,"moneda", 22),
-                new CashDTO(10,25,"moneda", 42),
-            };
-            inventoryService.SetInventory(stock);
-
-            // act 
-            bool error = inventoryService.ValidateRequestedUnits();
-
-            // assert
-            error.Should().BeTrue();
-        }
-
-        [Fact]
         public void UpdateStock()
         {
             // arrange
