@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using Application.AbstractInventory.Implementations;
-using System.Linq;
+﻿using Application.AbstractInventory.Implementations;
 using Domain.Money.DTOs;
 using Domain.Money.Entities;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Application.CashInventory
 {
@@ -10,8 +10,8 @@ namespace Application.CashInventory
     {
         protected override int GetItemAmount(int index)
         {
-           int amount = inventory.ElementAt(index).Amount;
-           return amount;
+            int amount = inventory.ElementAt(index).Amount;
+            return amount;
         }
 
         protected override double GetItemPrice(int index)
@@ -44,10 +44,10 @@ namespace Application.CashInventory
         public IList<Cash> GetPaymentChange(double payment)
         {
             inventory = inventory.OrderByDescending(cash => cash.Price).ToList();
-            IList <CashDTO> result = new List<CashDTO>();
+            IList<CashDTO> result = new List<CashDTO>();
             double currentChange = 0;
             int index = 0;
-            while(index < inventory.Count)
+            while (index < inventory.Count)
             {
                 if (currentChange == payment)
                     break;

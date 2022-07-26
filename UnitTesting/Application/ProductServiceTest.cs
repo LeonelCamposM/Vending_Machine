@@ -1,11 +1,11 @@
 ﻿using Application.Products.Implementations;
+using Domain.Products.Entities;
+using Domain.Products.Repositories;
+using FluentAssertions;
+using Moq;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
 using Xunit;
-using Moq;
-using Domain.Products.Repositories;
-using Domain.Products.Entities;
 
 namespace UnitTesting.Application.ProductServiceTests
 {
@@ -32,6 +32,6 @@ namespace UnitTesting.Application.ProductServiceTests
             // assert
             result.Length().Should().Be(4);
         }
-        
+
     }
 }

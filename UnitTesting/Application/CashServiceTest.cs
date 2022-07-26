@@ -1,11 +1,11 @@
 ﻿using Application.Money.Implementations;
+using Domain.Money.Entities;
+using Domain.Money.Repositories;
+using FluentAssertions;
+using Moq;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
 using Xunit;
-using Moq;
-using Domain.Money.Repositories;
-using Domain.Money.Entities;
 
 namespace UnitTesting.Application.CashServiceTests
 {
@@ -31,6 +31,6 @@ namespace UnitTesting.Application.CashServiceTests
             // assert
             result.Length().Should().Be(3);
         }
-        
+
     }
 }

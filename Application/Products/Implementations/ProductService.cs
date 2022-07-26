@@ -1,5 +1,5 @@
-﻿using Domain.Products.Repositories;
-using Domain.Products.Entities;
+﻿using Domain.Products.Entities;
+using Domain.Products.Repositories;
 using System.Collections.Generic;
 
 namespace Application.Products.Implementations

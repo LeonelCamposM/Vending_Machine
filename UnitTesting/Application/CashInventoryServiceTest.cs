@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
-using Xunit;
-using Application.CashInventory;
+﻿using Application.CashInventory;
 using Domain.Money.DTOs;
 using Domain.Money.Entities;
+using FluentAssertions;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace UnitTesting.Application.ProductInventoryServiceTests
 {
@@ -95,17 +95,12 @@ namespace UnitTesting.Application.ProductInventoryServiceTests
             inventoryService.SetInventory(stock);
 
             // act 
-            IList <Cash>  change = inventoryService.GetPaymentChange(3500);
+            IList<Cash> change = inventoryService.GetPaymentChange(3500);
 
             //// assert
-            change.Length().Should().Be(7);
+            change.Length().Should().Be(1);
             change[0].Price.Should().Be(500);
-            change[1].Price.Should().Be(500);
-            change[2].Price.Should().Be(500);
-            change[3].Price.Should().Be(500);
-            change[4].Price.Should().Be(500);
-            change[5].Price.Should().Be(500);
-            change[6].Price.Should().Be(500);
+            change[0].Amount.Should().Be(7);
         }
     }
 }

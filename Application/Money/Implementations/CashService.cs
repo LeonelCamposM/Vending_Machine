@@ -1,5 +1,5 @@
-﻿using Domain.Money.Repositories;
-using Domain.Money.Entities;
+﻿using Domain.Money.Entities;
+using Domain.Money.Repositories;
 using System.Collections.Generic;
 
 namespace Application.Money.Implementations

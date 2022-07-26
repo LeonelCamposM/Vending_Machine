@@ -1,8 +1,8 @@
 ﻿using Application.ProductInventory;
-using System.Collections.Generic;
 using Domain.Products.DTOs;
-using System.Linq;
 using FluentAssertions;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace UnitTesting.Application.ProductInventoryServiceTests

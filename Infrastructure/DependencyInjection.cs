@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Domain.Money.Repositories;
 using Domain.Products.Repositories;
-using Domain.Money.Repositories;
-using Infrastructure.Products.Repositories;
 using Infrastructure.Money.Repositories;
+using Infrastructure.Products.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Infrastructure

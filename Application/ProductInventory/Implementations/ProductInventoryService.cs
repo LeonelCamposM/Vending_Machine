@@ -1,6 +1,6 @@
-﻿using Domain.Products.DTOs;
+﻿using Application.AbstractInventory.Implementations;
+using Domain.Products.DTOs;
 using System.Collections.Generic;
-using Application.AbstractInventory.Implementations;
 using System.Linq;
 
 namespace Application.ProductInventory
@@ -9,8 +9,8 @@ namespace Application.ProductInventory
     {
         protected override int GetItemAmount(int index)
         {
-           int amount = inventory.ElementAt(index).Amount;
-           return amount;
+            int amount = inventory.ElementAt(index).Amount;
+            return amount;
         }
 
         protected override double GetItemPrice(int index)

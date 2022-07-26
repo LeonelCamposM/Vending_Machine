@@ -14,7 +14,7 @@ namespace Infrastructure.Products
             new Product(10,500,"Coca cola"),
             new Product(8,600,"Pepsi"),
             new Product(10,550,"Fanta"),
-            new Product(15,725,"Sprite"),   
+            new Product(15,725,"Sprite"),
         };
     }
 }
