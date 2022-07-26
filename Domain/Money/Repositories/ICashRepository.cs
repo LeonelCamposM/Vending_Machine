@@ -6,5 +6,6 @@ namespace Domain.Money.Repositories
     public interface ICashRepository
     {
         IList<Cash> GetAvailableCash();
+        void UpdateAvailableCash(IList<Cash> availableCash);
     }
 }

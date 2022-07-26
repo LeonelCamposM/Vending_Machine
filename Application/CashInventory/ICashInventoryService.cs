@@ -12,5 +12,6 @@ namespace Application.CashInventory
         public double GetFullInventoryCost();
         public void SetInventory(IList<CashDTO> newInventory);
         public IList<CashDTO> GetPaymentChange(double payment);
+        public IList<CashDTO> GetInventory();
     }
 }

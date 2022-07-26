@@ -67,5 +67,10 @@ namespace Application.CashInventory
             }
             return result;
         }
+
+        public override IList<CashDTO> GetInventory()
+        {
+            return inventory;
+        }
     }
 }

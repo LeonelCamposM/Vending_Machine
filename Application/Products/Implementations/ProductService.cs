@@ -17,5 +17,10 @@ namespace Application.Products.Implementations
         {
             return _productRepository.GetAvailableProducts();
         }
+
+        public void UpdateAvailableProducts(IList<Product> availableProducts)
+        {
+            _productRepository.UpdateAvailableProducts(availableProducts);
+        }
     }
 }

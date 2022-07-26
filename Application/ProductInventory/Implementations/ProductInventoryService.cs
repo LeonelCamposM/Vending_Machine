@@ -39,5 +39,10 @@ namespace Application.ProductInventory
         {
             inventory.ElementAt(index).requestedUnits = newUnits;
         }
+
+        public override IList<ProductDTO> GetInventory()
+        {
+            return inventory;
+        }
     }
 }

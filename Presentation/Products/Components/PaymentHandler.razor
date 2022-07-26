@@ -87,7 +87,7 @@
     private bool _succesfulPurchase = false;
     private IList<Cash> _consumerChange = new List<Cash>();
     private double _finalChange = 0;
- 
+
     protected override void OnInitialized()
     {
         IList<Cash> availableCash = CashService.GetAvailableCash();
@@ -116,6 +116,12 @@
                 _finalChange = consumerChange;
                 var result = InventoryService.GetPaymentChange(consumerChange);
                 GroupChange(result);
+                IList<Cash>  availableCash =  new List<Cash>();
+                foreach (var product in InventoryService.GetInventory())
+                {
+                    availableCash.Add(new Cash(product.amount, product.price, product.name));
+                }
+                CashService.UpdateAvailableCash(availableCash);
                 _succesfulPurchase = true;
             }
             else

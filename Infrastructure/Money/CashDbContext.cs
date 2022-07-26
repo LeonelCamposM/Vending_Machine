@@ -10,7 +10,7 @@ namespace Infrastructure.Money
         }
 
         // IList simulates a database
-        public IEnumerable<Cash> Money = new List<Cash>(){
+        public IList<Cash> Money = new List<Cash>(){
             new Cash(20,500,"Moneda"),
             new Cash(30,100,"Moneda"),
             new Cash(50,50,"Moneda"),

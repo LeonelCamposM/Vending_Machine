@@ -17,5 +17,10 @@ namespace Application.Money.Implementations
         {
             return _cashRepository.GetAvailableCash();
         }
+
+        public void UpdateAvailableCash(IList<Cash> availableCash)
+        {
+            _cashRepository.UpdateAvailableCash(availableCash);
+        }
     }
 }

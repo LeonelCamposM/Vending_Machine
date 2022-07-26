@@ -19,5 +19,10 @@ namespace Infrastructure.Money.Repositories
             IList<Cash> availableCash = _dbContext.Money.OrderByDescending(cash => cash.amount).ToList();
             return availableCash;
         }
+
+        public void UpdateAvailableCash(IList<Cash> availableCash)
+        {
+            _dbContext.Money = availableCash;
+        }
     }
 }

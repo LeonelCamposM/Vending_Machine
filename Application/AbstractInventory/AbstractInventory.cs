@@ -83,5 +83,6 @@ namespace Application.AbstractInventory.Implementations
         protected abstract void SetProductAmount(int index, int newAmount);
         protected abstract void SetRequestedUnits(int index, int newUnits);
         public abstract void SetInventory(IList<T> inventory);
+        public abstract IList<T> GetInventory();
     }
 }

@@ -19,5 +19,10 @@ namespace Infrastructure.Products.Repositories
             IList<Product> availableProducts = _dbContext.Products.OrderBy(product => product.name).ToList();
             return availableProducts;
         }
+
+        public void UpdateAvailableProducts(IList<Product> availableProducts)
+        {
+            _dbContext.Products = availableProducts;
+        }
     }
 }

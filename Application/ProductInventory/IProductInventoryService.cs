@@ -11,5 +11,6 @@ namespace Application.ProductInventory
         public string CostFormat(double cost);
         public double GetFullInventoryCost();
         public void SetInventory(IList<ProductDTO> newInventory);
+        public IList<ProductDTO> GetInventory();
     }
 }

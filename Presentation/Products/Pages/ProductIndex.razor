@@ -138,6 +138,12 @@
     private void UpdateStock()
     {
         _stock = InventoryService.UpdateStock();
+        IList<Product> availableProducts = new List<Product>();
+        foreach (var product in _stock)
+        {
+            availableProducts.Add(new Product(product.amount, product.price, product.name));
+        }
+        ProductService.UpdateAvailableProducts(availableProducts);
         SnackBar.Add("Compra realizada", Severity.Success);
         ToggleBuyOverlay();
     }
