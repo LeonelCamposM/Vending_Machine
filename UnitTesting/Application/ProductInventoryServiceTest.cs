@@ -5,9 +5,9 @@ using System.Linq;
 using FluentAssertions;
 using Xunit;
 
-namespace UnitTesting.Application.InventoryServiceTests
+namespace UnitTesting.Application.ProductInventoryServiceTests
 {
-    public class InventoryServiceTests
+    public class ProductInventoryServiceTests
     {
         ProductInventoryService inventoryService = new ProductInventoryService();
 

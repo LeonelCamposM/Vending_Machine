@@ -2,9 +2,8 @@
 using Application.AbstractInventory.Implementations;
 using System.Linq;
 using Domain.Money.DTOs;
-using Application.CashInventory;
 
-namespace Application.ProductInventory
+namespace Application.CashInventory
 {
     public class CashInventoryService : AbstractInventory<CashDTO>, ICashInventoryService
     {

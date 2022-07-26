@@ -3,7 +3,7 @@ using FluentAssertions;
 using Xunit;
 using Domain.Products.Entities;
 
-namespace UnitTesting.Application.ProductTests
+namespace UnitTesting.Domain.ProductTests
 {
     public class ProductTests
     {

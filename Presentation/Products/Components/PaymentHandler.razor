@@ -17,6 +17,7 @@
                 <ToolBarContent>
                     <MudButton Color="Color.Primary" OnClick="MakePayment" Variant="Variant.Filled">Realizar pago </MudButton>
                     <MudSpacer />
+                    <MudButton Variant="Variant.Filled" Color="Color.Transparent" OnClick="SendConmuteSignal" Size="Size.Medium">Cancelar</MudButton>
                 </ToolBarContent> 
                 <HeaderContent>
                     <MudTh>Tipo de pago</MudTh>
@@ -39,9 +40,6 @@
                 </RowTemplate>
         </MudTable>
         </MudPaper>
-        <MudItem xs="12" md="12" Style="width: 100%;" Class="d-flex justify-start">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SendConmuteSignal" Size="Size.Medium">Cerrar</MudButton>
-        </MudItem>
 </Overlay>
 
 @code {
