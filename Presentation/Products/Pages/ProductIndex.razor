@@ -35,19 +35,19 @@
                 </HeaderContent>
         
                 <RowTemplate>
-                        <MudTd DataLabel="Nombre">@context.name</MudTd>
-                        <MudTd DataLabel="Unidades disponibles">@context.amount</MudTd>
+                        <MudTd DataLabel="Nombre">@context.Name</MudTd>
+                        <MudTd DataLabel="Unidades disponibles">@context.Amount</MudTd>
                         <MudTd DataLabel="Unidades solicitadas">
-                            @if(context.amount < context.requestedUnits){
-                                <MudNumericField Immediate="true" @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
+                            @if(context.Amount < context.RequestedUnits){
+                                <MudNumericField Immediate="true" @bind-Value="context.RequestedUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
                             }
                             else{
-                                <MudNumericField  Immediate="true" @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
+                                <MudNumericField  Immediate="true" @bind-Value="context.RequestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
                             }
                 
                         </MudTd>
 
-                    <MudTd  DataLabel="Precio unitario"> <MudText Align="Align.Right">  @InventoryService.CostFormat(context.price) </MudText></MudTd>
+                    <MudTd  DataLabel="Precio unitario"> <MudText Align="Align.Right">  @InventoryService.CostFormat(context.Price) </MudText></MudTd>
                 </RowTemplate>
             <PagerContent>
                 <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Color="Color.Primary" Class="pa-4"/>
@@ -76,7 +76,7 @@
         IList<Product> availableProducts = ProductService.GetAvailableProducts();
         foreach (var product in availableProducts)
         {
-            _stock.Add(new ProductDTO(product.amount, product.price, product.name, 0));
+            _stock.Add(new ProductDTO(product.Amount, product.Price, product.Name, 0));
         }
         InventoryService.SetInventory(_stock);
         _loading = false;
@@ -125,7 +125,7 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (product.name.ToLower().Contains(searchString.ToLower()))
+        if (product.Name.ToLower().Contains(searchString.ToLower()))
             return true;
         return false;
     }
@@ -137,11 +137,11 @@
 
     private void UpdateStock()
     {
-        _stock = InventoryService.UpdateStock();
+        _stock = InventoryService.UpdateInventory();
         IList<Product> availableProducts = new List<Product>();
         foreach (var product in _stock)
         {
-            availableProducts.Add(new Product(product.amount, product.price, product.name));
+            availableProducts.Add(new Product(product.Amount, product.Price, product.Name));
         }
         ProductService.UpdateAvailableProducts(availableProducts);
         SnackBar.Add("Compra realizada", Severity.Success);

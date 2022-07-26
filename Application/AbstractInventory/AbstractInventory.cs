@@ -20,24 +20,25 @@ namespace Application.AbstractInventory.Implementations
             int index = 0;
             foreach (var product in inventory)
             {
-                if (GetProductAmount(index) < GetRequestedUnits(index))
+                if (GetItemAmount(index) < GetRequestedUnits(index))
                 {
                     inputError = true;
+                    break;
                 }
                 index += 1;
             }
             return inputError;
         }
 
-        public IList<T> UpdateStock()
+        public IList<T> UpdateInventory()
         {
             int index = 0;
             foreach (var product in inventory)
             {
                 if (GetRequestedUnits(index) != 0)
                 {
-                    int newAmount = GetProductAmount(index) - GetRequestedUnits(index);
-                    SetProductAmount(index, newAmount);
+                    int newAmount = GetItemAmount(index) - GetRequestedUnits(index);
+                    SetItemAmount(index, newAmount);
                     SetRequestedUnits(index, 0);
                 }
                 index += 1;
@@ -51,7 +52,7 @@ namespace Application.AbstractInventory.Implementations
             int index = 0;
             foreach (var product in inventory)
             {
-                totalCost += GetProductPrice(index) * GetRequestedUnits(index);
+                totalCost += GetItemPrice(index) * GetRequestedUnits(index);
                 index += 1;
             }
             return totalCost;
@@ -71,16 +72,16 @@ namespace Application.AbstractInventory.Implementations
             int index = 0;
             foreach (var product in inventory)
             {
-                totalCost += GetProductPrice(index) * GetProductAmount(index);
+                totalCost += GetItemPrice(index) * GetItemAmount(index);
                 index += 1;
             }
             return totalCost;
         }
 
-        protected abstract double GetProductPrice(int index);
-        protected abstract int GetProductAmount(int index);
+        protected abstract double GetItemPrice(int index);
+        protected abstract int GetItemAmount(int index);
         protected abstract int GetRequestedUnits(int index);
-        protected abstract void SetProductAmount(int index, int newAmount);
+        protected abstract void SetItemAmount(int index, int newAmount);
         protected abstract void SetRequestedUnits(int index, int newUnits);
         public abstract void SetInventory(IList<T> inventory);
         public abstract IList<T> GetInventory();

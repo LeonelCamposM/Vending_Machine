@@ -2,15 +2,15 @@
 {
     public class Product
     {
-        public int amount { get; set; }
-        public double price { get; set; }
-        public string name { get; set; }
+        public int Amount { get; set; }
+        public double Price { get; set; }
+        public string Name { get; set; }
 
         public Product(int amount, double price, string name)
         {
-            this.amount = amount;
-            this.price = price;
-            this.name = name;
+            Amount = amount;
+            Price = price;
+            Name = name;
         }
     }
 }

@@ -7,21 +7,21 @@ namespace Application.CashInventory
 {
     public class CashInventoryService : AbstractInventory<CashDTO>, ICashInventoryService
     {
-        protected override int GetProductAmount(int index)
+        protected override int GetItemAmount(int index)
         {
-           int amount = inventory.ElementAt(index).amount;
+           int amount = inventory.ElementAt(index).Amount;
            return amount;
         }
 
-        protected override double GetProductPrice(int index)
+        protected override double GetItemPrice(int index)
         {
-            double price = inventory.ElementAt(index).price;
+            double price = inventory.ElementAt(index).Price;
             return price;
         }
 
         protected override int GetRequestedUnits(int index)
         {
-            int requestedUnits = inventory.ElementAt(index).requestedUnits;
+            int requestedUnits = inventory.ElementAt(index).RequestedUnits;
             return requestedUnits;
         }
 
@@ -30,19 +30,19 @@ namespace Application.CashInventory
             inventory = newInventory;
         }
 
-        protected override void SetProductAmount(int index, int newAmount)
+        protected override void SetItemAmount(int index, int newAmount)
         {
-            inventory.ElementAt(index).amount = newAmount;
+            inventory.ElementAt(index).Amount = newAmount;
         }
 
         protected override void SetRequestedUnits(int index, int newUnits)
         {
-            inventory.ElementAt(index).requestedUnits = newUnits;
+            inventory.ElementAt(index).RequestedUnits = newUnits;
         }
 
         public IList<CashDTO> GetPaymentChange(double payment)
         {
-            inventory = inventory.OrderByDescending(cash => cash.price).ToList();
+            inventory = inventory.OrderByDescending(cash => cash.Price).ToList();
             IList <CashDTO> result = new List<CashDTO>();
             double currentChange = 0;
             int index = 0;
@@ -52,13 +52,12 @@ namespace Application.CashInventory
                 {
                     break;
                 }
-                CashDTO cash = inventory[index];
-                double tempChange = cash.price;
-                if(tempChange+currentChange <= payment && cash.amount > 0)
+                CashDTO currency = inventory[index];
+                bool usable = ValidateCurrencyUsability(index, payment, currentChange);
+                if (usable)
                 {
-                    currentChange += tempChange;
-                    inventory[index].amount -= 1;
-                    result.Add(cash);
+                    currentChange += currency.Price;
+                    result.Add(currency);
                 }
                 else
                 {
@@ -66,6 +65,20 @@ namespace Application.CashInventory
                 }
             }
             return result;
+        }
+
+        private bool ValidateCurrencyUsability(int index, double payment, double currentChange)
+        {
+            bool usable = false;
+            CashDTO currency = inventory[index];
+            double price = currency.Price;
+            bool lessThanPayment = price + currentChange <= payment;
+            if (lessThanPayment && currency.Amount > 0)
+            {
+                inventory[index].Amount -= 1;
+                usable = true;
+            }
+            return usable;
         }
 
         public override IList<CashDTO> GetInventory()

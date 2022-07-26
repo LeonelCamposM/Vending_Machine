@@ -7,21 +7,21 @@ namespace Application.ProductInventory
 {
     public class ProductInventoryService : AbstractInventory<ProductDTO>, IProductInventoryService
     {
-        protected override int GetProductAmount(int index)
+        protected override int GetItemAmount(int index)
         {
-           int amount = inventory.ElementAt(index).amount;
+           int amount = inventory.ElementAt(index).Amount;
            return amount;
         }
 
-        protected override double GetProductPrice(int index)
+        protected override double GetItemPrice(int index)
         {
-            double price = inventory.ElementAt(index).price;
+            double price = inventory.ElementAt(index).Price;
             return price;
         }
 
         protected override int GetRequestedUnits(int index)
         {
-            int requestedUnits = inventory.ElementAt(index).requestedUnits;
+            int requestedUnits = inventory.ElementAt(index).RequestedUnits;
             return requestedUnits;
         }
 
@@ -30,14 +30,14 @@ namespace Application.ProductInventory
             inventory = newInventory;
         }
 
-        protected override void SetProductAmount(int index, int newAmount)
+        protected override void SetItemAmount(int index, int newAmount)
         {
-            inventory.ElementAt(index).amount = newAmount;
+            inventory.ElementAt(index).Amount = newAmount;
         }
 
         protected override void SetRequestedUnits(int index, int newUnits)
         {
-            inventory.ElementAt(index).requestedUnits = newUnits;
+            inventory.ElementAt(index).RequestedUnits = newUnits;
         }
 
         public override IList<ProductDTO> GetInventory()

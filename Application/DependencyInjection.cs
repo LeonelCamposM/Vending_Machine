@@ -1,6 +1,6 @@
-﻿using Application.Products;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Application.Products;
 using Application.Products.Implementations;
-using Microsoft.Extensions.DependencyInjection;
 using Application.Money;
 using Application.Money.Implementations;
 using Application.ProductInventory;

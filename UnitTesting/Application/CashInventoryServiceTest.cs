@@ -59,12 +59,12 @@ namespace UnitTesting.Application.ProductInventoryServiceTests
             inventoryService.SetInventory(stock);
 
             // act 
-            IList<CashDTO> result = inventoryService.UpdateStock();
+            IList<CashDTO> result = inventoryService.UpdateInventory();
 
             // assert
-            result.ElementAt(0).amount.Should().Be(9);
-            result.ElementAt(1).amount.Should().Be(8);
-            result.ElementAt(2).amount.Should().Be(7);
+            result.ElementAt(0).Amount.Should().Be(9);
+            result.ElementAt(1).Amount.Should().Be(8);
+            result.ElementAt(2).Amount.Should().Be(7);
         }
 
         [Fact]
@@ -134,13 +134,13 @@ namespace UnitTesting.Application.ProductInventoryServiceTests
 
             //// assert
             change.Length().Should().Be(7);
-            change[0].price.Should().Be(500);
-            change[1].price.Should().Be(500);
-            change[2].price.Should().Be(500);
-            change[3].price.Should().Be(500);
-            change[4].price.Should().Be(500);
-            change[5].price.Should().Be(500);
-            change[6].price.Should().Be(500);
+            change[0].Price.Should().Be(500);
+            change[1].Price.Should().Be(500);
+            change[2].Price.Should().Be(500);
+            change[3].Price.Should().Be(500);
+            change[4].Price.Should().Be(500);
+            change[5].Price.Should().Be(500);
+            change[6].Price.Should().Be(500);
         }
     }
 }

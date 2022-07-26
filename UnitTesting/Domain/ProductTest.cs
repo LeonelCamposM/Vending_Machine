@@ -14,9 +14,9 @@ namespace UnitTesting.Domain.ProductTests
            Product product = new Product(10, 500, "Coca cola");
 
             // assert
-            product.amount.Should().Be(10);
-            product.price.Should().Be(500);
-            product.name.Should().Be("Coca cola");
+            product.Amount.Should().Be(10);
+            product.Price.Should().Be(500);
+            product.Name.Should().Be("Coca cola");
         }
         
         [Fact]
@@ -26,10 +26,10 @@ namespace UnitTesting.Domain.ProductTests
             ProductDTO product = new ProductDTO(10, 500, "Coca cola", 2);
 
             // assert
-            product.amount.Should().Be(10);
-            product.price.Should().Be(500);
-            product.name.Should().Be("Coca cola");
-            product.requestedUnits.Should().Be(2);
+            product.Amount.Should().Be(10);
+            product.Price.Should().Be(500);
+            product.Name.Should().Be("Coca cola");
+            product.RequestedUnits.Should().Be(2);
         }
     }
 }

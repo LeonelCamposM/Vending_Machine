@@ -10,7 +10,7 @@ namespace Infrastructure.Products
         }
 
         // IList simulates a database
-        public IEnumerable<Product> Products = new List<Product>(){
+        public IList<Product> Products = new List<Product>(){
             new Product(10,500,"Coca cola"),
             new Product(8,600,"Pepsi"),
             new Product(10,550,"Fanta"),

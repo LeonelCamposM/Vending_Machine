@@ -20,8 +20,15 @@
         <MudTreeView ExpandOnClick="true" T="string">
             <MudTreeViewItem  Value="@("Desglose de cambio")">
                 @foreach (var item in _consumerChange)
-                { 
-                    <MudTreeViewItem Value="@(item.amount+" "+item.name +" "+item.price)" />
+                {
+                    @if (item.Amount > 1)
+                    {
+                        <MudTreeViewItem Value="@(item.Amount+" "+item.Name+"s de "+item.Price)" />
+                    }
+                    else
+                    {
+                        <MudTreeViewItem Value="@(item.Amount+" "+item.Name +" de "+item.Price)" />
+                    }
                 }
             </MudTreeViewItem>
         </MudTreeView>
@@ -49,15 +56,15 @@
                 </HeaderContent>
         
                 <RowTemplate>
-                        <MudTd DataLabel="Tipo de pago">@context.name</MudTd>
-                        <MudTd DataLabel="Valor">@context.price</MudTd>
+                        <MudTd DataLabel="Tipo de pago">@context.Name</MudTd>
+                        <MudTd DataLabel="Valor">@context.Price</MudTd>
                         <MudTd DataLabel="Unidades ingresadas">
-                            @if(context.requestedUnits < 0)
+                            @if(context.RequestedUnits < 0)
                             {
-                                <MudNumericField Immediate="true" @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
+                                <MudNumericField Immediate="true" @bind-Value="context.RequestedUnits" Label="Cantidad" Variant="Variant.Text"  Error="true" Min="0"/>
                             }
                             else{
-                                <MudNumericField  Immediate="true" @bind-Value="context.requestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
+                                <MudNumericField  Immediate="true" @bind-Value="context.RequestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
                             }
                         </MudTd>
                 </RowTemplate>
@@ -93,7 +100,7 @@
         IList<Cash> availableCash = CashService.GetAvailableCash();
         foreach (var product in availableCash)
         {
-            _changeBox.Add(new CashDTO(product.amount, product.price, product.name, 0));
+            _changeBox.Add(new CashDTO(product.Amount, product.Price, product.Name, 0));
         }
     }  
 
@@ -119,7 +126,7 @@
                 IList<Cash>  availableCash =  new List<Cash>();
                 foreach (var product in InventoryService.GetInventory())
                 {
-                    availableCash.Add(new Cash(product.amount, product.price, product.name));
+                    availableCash.Add(new Cash(product.Amount, product.Price, product.Name));
                 }
                 CashService.UpdateAvailableCash(availableCash);
                 _succesfulPurchase = true;
@@ -159,12 +166,12 @@
     {
         var GroupedChange = 
                         from cash in consumerChange
-                        group cash by cash.price;
+                        group cash by cash.Price;
 
         foreach (var cashGroup in GroupedChange)
         {
             var cash = cashGroup.FirstOrDefault();
-            _consumerChange.Add(new Cash(cashGroup.Count(), cash.price, cash.name));
+            _consumerChange.Add(new Cash(cashGroup.Count(), cash.Price, cash.Name));
         }
     }
 }

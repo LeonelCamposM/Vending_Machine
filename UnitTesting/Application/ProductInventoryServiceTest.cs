@@ -62,13 +62,13 @@ namespace UnitTesting.Application.ProductInventoryServiceTests
             inventoryService.SetInventory(stock);
 
             // act 
-            IList<ProductDTO> result = inventoryService.UpdateStock();
+            IList<ProductDTO> result = inventoryService.UpdateInventory();
 
             // assert
-            result.ElementAt(0).amount.Should().Be(0);
-            result.ElementAt(1).amount.Should().Be(6);
-            result.ElementAt(2).amount.Should().Be(7);
-            result.ElementAt(3).amount.Should().Be(13);
+            result.ElementAt(0).Amount.Should().Be(0);
+            result.ElementAt(1).Amount.Should().Be(6);
+            result.ElementAt(2).Amount.Should().Be(7);
+            result.ElementAt(3).Amount.Should().Be(13);
         }
 
         [Fact]
