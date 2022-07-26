@@ -1,4 +1,4 @@
-﻿using Application.Inventory.Implementations;
+﻿using Application.ProductInventory;
 using System.Collections.Generic;
 using Domain.Products.DTOs;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace UnitTesting.Application.InventoryServiceTests
 {
     public class InventoryServiceTests
     {
-        InventoryService inventoryService = new InventoryService();
+        ProductInventoryService inventoryService = new ProductInventoryService();
 
         [Fact]
         public void ValidRequestedUnits()
@@ -21,9 +21,10 @@ namespace UnitTesting.Application.InventoryServiceTests
                 new ProductDTO(10,550,"Fanta", 3),
                 new ProductDTO(15,725,"Sprite", 2)
             };
+            inventoryService.SetInventory(stock);
 
             // act 
-            bool error = inventoryService.ValidateRequestedUnits(stock);
+            bool error = inventoryService.ValidateRequestedUnits();
 
             // assert
             error.Should().BeFalse();
@@ -39,9 +40,10 @@ namespace UnitTesting.Application.InventoryServiceTests
                 new ProductDTO(10,550,"Fanta", 3),
                 new ProductDTO(15,725,"Sprite", 2)
             };
+            inventoryService.SetInventory(stock);
 
             // act 
-            bool error = inventoryService.ValidateRequestedUnits(stock);
+            bool error = inventoryService.ValidateRequestedUnits();
 
             // assert
             error.Should().BeTrue();
@@ -57,9 +59,10 @@ namespace UnitTesting.Application.InventoryServiceTests
                 new ProductDTO(10,550,"Fanta", 3),
                 new ProductDTO(15,725,"Sprite", 2)
             };
+            inventoryService.SetInventory(stock);
 
             // act 
-            IList<ProductDTO> result = inventoryService.UpdateStock(stock);
+            IList<ProductDTO> result = inventoryService.UpdateStock();
 
             // assert
             result.ElementAt(0).amount.Should().Be(0);
@@ -78,9 +81,10 @@ namespace UnitTesting.Application.InventoryServiceTests
                 new ProductDTO(10,550,"Fanta", 3),
                 new ProductDTO(15,725,"Sprite", 2)
             };
+            inventoryService.SetInventory(stock);
 
             // act 
-            double totalCost = inventoryService.UpdateTotalCost(stock);
+            double totalCost = inventoryService.UpdateTotalCost();
 
             // assert
             totalCost.Should().Be(9300.0);
@@ -108,9 +112,10 @@ namespace UnitTesting.Application.InventoryServiceTests
                 new ProductDTO(10,550,"Fanta", 3),
                 new ProductDTO(15,725,"Sprite", 2)
             };
+            inventoryService.SetInventory(stock);
 
             // act 
-            double result = inventoryService.GetFullInventoryCost(stock);
+            double result = inventoryService.GetFullInventoryCost();
 
             // assert
             result.Should().Be(26175);

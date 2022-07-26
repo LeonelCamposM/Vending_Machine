@@ -1,12 +1,13 @@
-﻿@using Domain.Money.Entities
+﻿@using Domain.Money.DTOs
+@using Domain.Money.Entities
 @using Domain.Products.DTOs
 @using Presentation.Core.Components
 @using Application.Products
-@using Application.Inventory
 @using Application.Money
+@using Application.CashInventory
 @inject IProductService ProductService
 @inject ICashService CashService
-@inject IInventoryService InventoryService
+@inject ICashInventoryService InventoryService
 @inject ISnackbar SnackBar
 
 <Overlay IsOpen="buyPressed">
@@ -55,26 +56,26 @@
 
     private double _consumerTotalPayment { get; set; }
 
-    private IList<ProductDTO> _changeBox = new List<ProductDTO>();
+    private IList<CashDTO> _changeBox = new List<CashDTO>();
 
-    private IList<ProductDTO> _consumerPayment = new List<ProductDTO>(){
-            new ProductDTO(0,1000,"Billete",0),
-            new ProductDTO(0,500,"Moneda",0),
-            new ProductDTO(0,100,"Moneda",0),
-            new ProductDTO(0,50,"Moneda",0),
-            new ProductDTO(0,25,"Moneda",0),
+    private IList<CashDTO> _consumerPayment = new List<CashDTO>(){
+            new CashDTO(0,1000,"Billete",0),
+            new CashDTO(0,500,"Moneda",0),
+            new CashDTO(0,100,"Moneda",0),
+            new CashDTO(0,50,"Moneda",0),
+            new CashDTO(0,25,"Moneda",0),
     };
+
+    private MudTable<CashDTO> _table;
 
     protected override void OnInitialized()
     {
         IList<Cash> availableCash = CashService.GetAvailableCash();
         foreach (var product in availableCash)
         {
-            _changeBox.Add(new ProductDTO(product.amount, product.price, product.name, 0));
+            _changeBox.Add(new CashDTO(product.amount, product.price, product.name, 0));
         }
-    }
-
-    private MudTable<ProductDTO> _table;
+    }  
 
     private async Task SendConmuteSignal()
     {
@@ -83,10 +84,12 @@
 
     private void MakePayment()
     {
-        _consumerTotalPayment = InventoryService.UpdateTotalCost(_consumerPayment);
+        InventoryService.SetInventory(_consumerPayment);
+        _consumerTotalPayment = InventoryService.UpdateTotalCost();
         if (_consumerTotalPayment >= totalCost)
         {
-            double changeBoxValue = InventoryService.GetFullInventoryCost(_changeBox);
+            InventoryService.SetInventory(_changeBox);
+            double changeBoxValue = InventoryService.GetFullInventoryCost();
             double consumerChange = _consumerTotalPayment - totalCost;
             if (changeBoxValue >= consumerChange)
             {
@@ -107,12 +110,12 @@
 
     private void InitConsumerPayment()
     {
-        _consumerPayment = new List<ProductDTO>(){
-            new ProductDTO(0,1000,"Billete",0),
-            new ProductDTO(0,500,"Moneda",0),
-            new ProductDTO(0,100,"Moneda",0),
-            new ProductDTO(0,50,"Moneda",0),
-            new ProductDTO(0,25,"Moneda",0),
+        _consumerPayment = new List<CashDTO>(){
+            new CashDTO(0,1000,"Billete",0),
+            new CashDTO(0,500,"Moneda",0),
+            new CashDTO(0,100,"Moneda",0),
+            new CashDTO(0,50,"Moneda",0),
+            new CashDTO(0,25,"Moneda",0),
         };
     }
 }

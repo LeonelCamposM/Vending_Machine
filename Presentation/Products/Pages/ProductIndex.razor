@@ -1,5 +1,5 @@
-﻿@using Application.Products
-@using Application.Inventory
+﻿@using Application.ProductInventory
+@using Application.Products
 @using Domain.Products.Entities
 @using Domain.Products.DTOs
 @using Presentation.Core.Components
@@ -7,7 +7,7 @@
 @using System.Globalization
 @using Presentation.Products.Components
 @inject IProductService ProductService
-@inject IInventoryService InventoryService
+@inject IProductInventoryService InventoryService
 @inject ISnackbar SnackBar
 @page "/home"
 
@@ -73,6 +73,7 @@
         {
             _stock.Add(new ProductDTO(product.amount, product.price, product.name, 0));
         }
+        InventoryService.SetInventory(_stock);
         _loading = false;
         UpdateTotalCost();
     }
@@ -101,14 +102,14 @@
 
     private async Task ValidateRequestedUnits()
     {
-        _inputError = InventoryService.ValidateRequestedUnits(_stock);
+        _inputError = InventoryService.ValidateRequestedUnits();
         if (_inputError)
         {
             SnackBar.Add("Se ha solicitado una cantidad de unidades errónea", Severity.Error);
         }
         else
         {
-            _totalCost = InventoryService.UpdateTotalCost(_stock);
+            _totalCost = InventoryService.UpdateTotalCost();
         }
         await InvokeAsync(StateHasChanged);
         await Task.Delay(100);
@@ -131,7 +132,7 @@
 
     private void UpdateStock()
     {
-        _stock = InventoryService.UpdateStock(_stock);
+        _stock = InventoryService.UpdateStock();
         SnackBar.Add("Compra realizada", Severity.Success);
         ToggleBuyOverlay();
     }
