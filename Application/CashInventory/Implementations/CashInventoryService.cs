@@ -39,5 +39,33 @@ namespace Application.CashInventory
         {
             inventory.ElementAt(index).requestedUnits = newUnits;
         }
+
+        public IList<CashDTO> GetPaymentChange(double payment)
+        {
+            inventory = inventory.OrderByDescending(cash => cash.price).ToList();
+            IList <CashDTO> result = new List<CashDTO>();
+            double currentChange = 0;
+            int index = 0;
+            while(index < inventory.Count)
+            {
+                if (currentChange == payment)
+                {
+                    break;
+                }
+                CashDTO cash = inventory[index];
+                double tempChange = cash.price;
+                if(tempChange+currentChange <= payment && cash.amount > 0)
+                {
+                    currentChange += tempChange;
+                    inventory[index].amount -= 1;
+                    result.Add(cash);
+                }
+                else
+                {
+                    index += 1;
+                }
+            }
+            return result;
+        }
     }
 }

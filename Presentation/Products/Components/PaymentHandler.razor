@@ -10,6 +10,27 @@
 @inject ICashInventoryService InventoryService
 @inject ISnackbar SnackBar
 
+<MudDialog @bind-IsVisible="_succesfulPurchase">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Su vuelto es de: @InventoryService.CostFormat(finalChange)
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTreeView T="string">
+            <MudTreeViewItem Value="@("Desglose de cambio")">
+                @foreach (var item in _consumerChange)
+                { 
+                    <MudTreeViewItem Value="@(item.amount+" "+item.name +" "+item.price)" />
+                }
+            </MudTreeViewItem>
+        </MudTreeView>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="TogglesuccesfulPurchase" Class="px-10">Aceptar</MudButton>
+    </DialogActions>
+ </MudDialog>
+
 <Overlay IsOpen="buyPressed">
         <MudPaper Class="align-left border-none"  Elevation="0" Outlined="false" Style="max-width: 60vw; width: 60vw; height: 43vw; overflow: auto; max-height: 95vh; ">
             <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(totalCost) </MudText>
@@ -66,6 +87,12 @@
 
     private MudTable<CashDTO> _table;
 
+    private bool _succesfulPurchase = false;
+
+    private IList<Cash> _consumerChange = new List<Cash>();
+
+    private double finalChange = 0;
+
     protected override void OnInitialized()
     {
         IList<Cash> availableCash = CashService.GetAvailableCash();
@@ -91,9 +118,10 @@
             double consumerChange = _consumerTotalPayment - totalCost;
             if (changeBoxValue >= consumerChange)
             {
-                SnackBar.Add("Su vuelto es de "+InventoryService.CostFormat(consumerChange), Severity.Info);
-                InitConsumerPayment();
-                updateStockState.InvokeAsync();
+                finalChange = consumerChange;
+                var result = InventoryService.GetPaymentChange(consumerChange);
+                GroupChange(result);
+                _succesfulPurchase = true;
             }
             else
             {
@@ -115,5 +143,26 @@
             new CashDTO(0,50,"Moneda",0),
             new CashDTO(0,25,"Moneda",0),
         };
+    }
+
+    private void TogglesuccesfulPurchase()
+    {
+        _succesfulPurchase = !_succesfulPurchase;
+        private IList<Cash> _consumerChange = new List<Cash>();
+        InitConsumerPayment();
+        updateStockState.InvokeAsync();
+    }
+
+    private void GroupChange(IList<CashDTO> consumerChange)
+    {
+        var GroupedChange = 
+                        from cash in consumerChange
+                        group cash by cash.price;
+
+        foreach (var cashGroup in GroupedChange)
+        {
+            var cash = cashGroup.FirstOrDefault();
+            _consumerChange.Add(new Cash(cashGroup.Count(), cashGroup.FirstOrDefault().price, cash.name));
+        }
     }
 }
