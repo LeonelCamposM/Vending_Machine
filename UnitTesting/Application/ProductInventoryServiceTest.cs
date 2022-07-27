@@ -34,6 +34,28 @@ namespace UnitTesting.Application.ProductInventoryServiceTests
         }
 
         [Fact]
+        public void GetInventory()
+        {
+            // arrange
+            IList<ProductDTO> stock = new List<ProductDTO>(){
+                new ProductDTO(10,500,"Coca cola", 10),
+                new ProductDTO(8,600,"Pepsi", 2),
+                new ProductDTO(10,550,"Fanta", 3),
+                new ProductDTO(15,725,"Sprite", 2)
+            };
+            inventoryService.SetInventory(stock);
+
+            // act 
+            IList<ProductDTO> result = inventoryService.GetInventory();
+
+            // assert
+            result.ElementAt(0).Amount.Should().Be(10);
+            result.ElementAt(1).Amount.Should().Be(8);
+            result.ElementAt(2).Amount.Should().Be(10);
+            result.ElementAt(3).Amount.Should().Be(15);
+        }
+
+        [Fact]
         public void ValidUpdateTotalCost()
         {
             // arrange
