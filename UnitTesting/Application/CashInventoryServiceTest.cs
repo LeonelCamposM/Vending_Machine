@@ -1,51 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
-using Xunit;
-using Application.CashInventory;
+﻿using Application.CashInventory;
 using Domain.Money.DTOs;
+using Domain.Money.Entities;
+using FluentAssertions;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace UnitTesting.Application.ProductInventoryServiceTests
 {
     public class CashInventoryServiceTests
     {
-        CashInventoryService inventoryService = new CashInventoryService();
-
-        [Fact]
-        public void ValidRequestedUnits()
-        {
-            // arrange
-            IList<CashDTO> stock = new List<CashDTO>(){
-                new CashDTO(10,500,"moneda", 1),
-                new CashDTO(10,50,"moneda", 2),
-                new CashDTO(10,25,"moneda", 3),
-            };
-            inventoryService.SetInventory(stock);
-
-            // act 
-            bool error = inventoryService.ValidateRequestedUnits();
-
-            // assert
-            error.Should().BeFalse();
-        }
-
-        [Fact]
-        public void InvalidRequestedUnits()
-        {
-            // arrange
-            IList<CashDTO> stock = new List<CashDTO>(){
-                new CashDTO(10,500,"moneda", 1),
-                new CashDTO(10,50,"moneda", 22),
-                new CashDTO(10,25,"moneda", 42),
-            };
-            inventoryService.SetInventory(stock);
-
-            // act 
-            bool error = inventoryService.ValidateRequestedUnits();
-
-            // assert
-            error.Should().BeTrue();
-        }
+        readonly CashInventoryService inventoryService = new();
 
         [Fact]
         public void UpdateStock()
@@ -59,12 +24,12 @@ namespace UnitTesting.Application.ProductInventoryServiceTests
             inventoryService.SetInventory(stock);
 
             // act 
-            IList<CashDTO> result = inventoryService.UpdateStock();
+            IList<CashDTO> result = inventoryService.UpdateInventory();
 
             // assert
-            result.ElementAt(0).amount.Should().Be(9);
-            result.ElementAt(1).amount.Should().Be(8);
-            result.ElementAt(2).amount.Should().Be(7);
+            result.ElementAt(0).Amount.Should().Be(9);
+            result.ElementAt(1).Amount.Should().Be(8);
+            result.ElementAt(2).Amount.Should().Be(7);
         }
 
         [Fact]
@@ -115,6 +80,27 @@ namespace UnitTesting.Application.ProductInventoryServiceTests
 
             // assert
             result.Should().Be(5750.0);
+        }
+
+        [Fact]
+        public void GetPaymentChangeSuccess()
+        {
+            // arrange
+            IList<CashDTO> stock = new List<CashDTO>(){
+                new CashDTO(20,500,"moneda", 1),
+                new CashDTO(30,100,"moneda", 2),
+                new CashDTO(50,50,"moneda", 3),
+                new CashDTO(25,25,"moneda", 3),
+            };
+            inventoryService.SetInventory(stock);
+
+            // act 
+            IList<Cash> change = inventoryService.GetPaymentChange(3500);
+
+            //// assert
+            change.Length().Should().Be(1);
+            change[0].Price.Should().Be(500);
+            change[0].Amount.Should().Be(7);
         }
     }
 }

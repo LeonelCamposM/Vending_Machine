@@ -25,7 +25,7 @@ namespace Vending_Machine
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMudServices();
-            services.AddInfrastructureLayer(Configuration.GetConnectionString("DefaultConnection"));
+            services.AddInfrastructureLayer();
             services.AddApplicationLayer();
         }
 

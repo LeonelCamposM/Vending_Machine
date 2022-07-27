@@ -1,5 +1,5 @@
-﻿using Domain.Money.Repositories;
-using Domain.Money.Entities;
+﻿using Domain.Money.Entities;
+using Domain.Money.Repositories;
 using System.Collections.Generic;
 
 namespace Application.Money.Implementations
@@ -16,6 +16,11 @@ namespace Application.Money.Implementations
         public IList<Cash> GetAvailableCash()
         {
             return _cashRepository.GetAvailableCash();
+        }
+
+        public void UpdateAvailableCash(IList<Cash> availableCash)
+        {
+            _cashRepository.UpdateAvailableCash(availableCash);
         }
     }
 }

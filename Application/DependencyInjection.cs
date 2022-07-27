@@ -1,10 +1,10 @@
-﻿using Application.Products;
-using Application.Products.Implementations;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Application.CashInventory;
 using Application.Money;
 using Application.Money.Implementations;
 using Application.ProductInventory;
-using Application.CashInventory;
+using Application.Products;
+using Application.Products.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Application
 {

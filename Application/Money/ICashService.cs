@@ -6,5 +6,6 @@ namespace Application.Money
     public interface ICashService
     {
         IList<Cash> GetAvailableCash();
+        void UpdateAvailableCash(IList<Cash> availableCash);
     }
 }

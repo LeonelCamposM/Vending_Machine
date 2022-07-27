@@ -1,11 +1,11 @@
 ﻿using Application.Products.Implementations;
+using Domain.Products.Entities;
+using Domain.Products.Repositories;
+using FluentAssertions;
+using Moq;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
 using Xunit;
-using Moq;
-using Domain.Products.Repositories;
-using Domain.Products.Entities;
 
 namespace UnitTesting.Application.ProductServiceTests
 {
@@ -32,6 +32,29 @@ namespace UnitTesting.Application.ProductServiceTests
             // assert
             result.Length().Should().Be(4);
         }
-        
+
+        [Fact]
+        public void UpdateAvailableProducts()
+        {
+            // arrange
+            IList<Product> stock = new List<Product>(){
+                new Product(10,500,"Coca cola"),
+                new Product(8,600,"Pepsi"),
+                new Product(10,550,"Fanta"),
+            };
+
+            var mockProductRepository = new Mock<IProductRepository>();
+            var moqService = new ProductService(mockProductRepository.Object);
+            mockProductRepository.Setup(repo => repo.UpdateAvailableProducts(stock));
+            mockProductRepository.Setup(repo => repo.GetAvailableProducts()).Returns(stock.ToList());
+
+            // act
+            moqService.UpdateAvailableProducts(stock);
+            IList<Product> result = moqService.GetAvailableProducts();
+
+            // assert
+            result.Length().Should().Be(3);
+        }
+
     }
 }

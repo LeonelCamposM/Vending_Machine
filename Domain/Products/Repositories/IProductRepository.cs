@@ -6,5 +6,6 @@ namespace Domain.Products.Repositories
     public interface IProductRepository
     {
         IList<Product> GetAvailableProducts();
+        void UpdateAvailableProducts(IList<Product> availableProducts);
     }
 }

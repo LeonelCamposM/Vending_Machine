@@ -15,6 +15,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Presentation", "Presentatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTesting", "UnitTesting\UnitTesting.csproj", "{B38DE888-2F3E-4ACD-8AA1-11B66BB568D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UITesting", "UITesting\UITesting.csproj", "{BCC7A074-D512-43AD-ACD4-91D483549AC4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Design", "Design", "{76169361-DBEA-42FC-A8CA-5A09133C28DC}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Artefactos\MockUp.png = ..\..\Artefactos\MockUp.png
+		..\..\Artefactos\Test_Cases.pdf = ..\..\Artefactos\Test_Cases.pdf
+		..\..\Artefactos\UML.pdf = ..\..\Artefactos\UML.pdf
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +54,10 @@ Global
 		{B38DE888-2F3E-4ACD-8AA1-11B66BB568D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B38DE888-2F3E-4ACD-8AA1-11B66BB568D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B38DE888-2F3E-4ACD-8AA1-11B66BB568D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCC7A074-D512-43AD-ACD4-91D483549AC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCC7A074-D512-43AD-ACD4-91D483549AC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCC7A074-D512-43AD-ACD4-91D483549AC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCC7A074-D512-43AD-ACD4-91D483549AC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
