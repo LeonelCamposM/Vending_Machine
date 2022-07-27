@@ -23,16 +23,16 @@
 
         <HeaderContent>
             <MudTh>Tipo de pago</MudTh>
-            <MudTh>Valor</MudTh>
             <MudTh>Unidades ingresadas</MudTh>
+             <MudTh>Valor</MudTh>
         </HeaderContent>
         
         <RowTemplate>
-            <MudTd DataLabel="Tipo de pago">@context.Name</MudTd>
-            <MudTd DataLabel="Valor">@context.Price</MudTd>
+            <MudTd DataLabel="Tipo de pago">@context.Name</MudTd> 
             <MudTd DataLabel="Unidades ingresadas">
                 <MudNumericField  Immediate="true" @bind-Value="context.RequestedUnits" Label="Cantidad" Variant="Variant.Text" Min="0"/>
             </MudTd>
+            <MudTd DataLabel="Valor"> <MudText Align="Align.Right">@InventoryService.CostFormat(context.Price) </MudText> </MudTd>
         </RowTemplate>
     </MudTable>
 </Overlay>
