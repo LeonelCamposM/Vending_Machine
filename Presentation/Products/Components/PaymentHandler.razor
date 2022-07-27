@@ -1,12 +1,9 @@
 ﻿@using Domain.Money.DTOs
 @using Domain.Money.Entities
-@using Domain.Products.DTOs
 @using Presentation.Core.Components
-@using Application.Products
 @using Application.Money
 @using Application.CashInventory
 @using Presentation.Products.Models
-@inject IProductService ProductService
 @inject ICashService CashService
 @inject ICashInventoryService InventoryService
 @inject ISnackbar SnackBar
@@ -14,6 +11,7 @@
 <PaymentSummaryDialog consumerChange="_pageState.ConsumerChange" finalChange="_pageState.FinalChange" toggleDialogState="_ToggleDialog"  succesfulPurchase="_pageState.SuccesfulPurchase"/>
 <Overlay IsOpen="buyPressed">
     <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(totalCost) </MudText>
+    <MudText Align="Align.Right" Typo="Typo.h6">Monto Ingresado: @InventoryService.CostFormat(_pageState.ConsumerTotalPayment) </MudText>
     <MudTable @ref="@_pageState.Table" Items="@_pageState.ConsumerPayment" Elevation="6" Outlined="true" Hover="true" Breakpoint="Breakpoint.Sm">
         <ToolBarContent>
             <MudButton Color="Color.Primary" Size="Size.Small" OnClick="ValidatePayment" Variant="Variant.Filled">Realizar pago </MudButton>
@@ -44,14 +42,16 @@
     public EventCallback conMuteOverlayState { get; set; }
     [Parameter]
     public EventCallback saveTransactionState { get; set; }
-    [CascadingParameter]
+    [Parameter]
     public double totalCost { get; set; }
     private EventCallback _ToggleDialog => EventCallback.Factory.Create(this, TogglesuccesfulPurchase);
     private PaymentHandlerState _pageState = new PaymentHandlerState();
+    private bool _isLoading = false;
 
     protected override void OnInitialized()
     {
         LoadAvailableCash();
+        UpdateTotalInput();
     } 
 
     private void LoadAvailableCash()
@@ -70,6 +70,7 @@
 
     private void ValidatePayment()
     {
+        _isLoading = true;
         InventoryService.SetInventory(_pageState.ConsumerPayment);
         _pageState.ConsumerTotalPayment = InventoryService.UpdateTotalCost();
         if (_pageState.ConsumerTotalPayment >= totalCost)
@@ -80,6 +81,7 @@
         {
             SnackBar.Add("El monto ingresado es insuficiente, inténtelo de nuevo", Severity.Error);
         }
+        _isLoading = false;
     }
 
     private void MakePayment()
@@ -115,4 +117,20 @@
         }
         CashService.UpdateAvailableCash(availableCash);
     }
+
+    // refresh screen every 100ms
+    private async Task UpdateTotalInput()
+    {
+        while (true)
+        {
+            if (!_isLoading)
+            {
+                InventoryService.SetInventory(_pageState.ConsumerPayment);
+                _pageState.ConsumerTotalPayment = InventoryService.UpdateTotalCost();
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(100);
+            }
+        }
+    }
+
 }

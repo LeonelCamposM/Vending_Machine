@@ -15,13 +15,11 @@
 @if(!_pageState.Loading){
     if (_pageState.BuyPressed)
     {
-        <CascadingValue Value="_pageState.TotalCost">
-            <PaymentHandler buyPressed="_pageState.BuyPressed" saveTransactionState="_saveTransaction" conMuteOverlayState="_conmuteOverlay"></PaymentHandler>
-        </CascadingValue> 
+            <PaymentHandler buyPressed="_pageState.BuyPressed" totalCost="@InventoryService.UpdateTotalCost()" saveTransactionState="_saveTransaction" conMuteOverlayState="_conmuteOverlay"></PaymentHandler>
     }
     else
     {
-        <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(_pageState.TotalCost) </MudText>
+        <MudText Align="Align.Right" Typo="Typo.h6">Costo total: @InventoryService.CostFormat(InventoryService.UpdateTotalCost()) </MudText>
         <MudTable @ref="@_pageState.Table" Items="@_pageState.Inventory" RowsPerPage="4" Elevation="4"  Hover="true" Breakpoint="Breakpoint.Sm" Filter="new Func<ProductDTO,bool>(FilterFunction)">
                
             <ToolBarContent>
@@ -75,7 +73,6 @@
         }
         InventoryService.SetInventory(_pageState.Inventory);
         _pageState.Loading = false;
-        UpdateTotalCost();
     }
 
     private void PageChanged(int index)
@@ -85,17 +82,14 @@
 
     private void BeginTransaction()
     {
-        _pageState.BuyPressed = true;
-    }
-
-    // refresh screen every 100ms
-    private async Task UpdateTotalCost()
-    {
-        while (true)
+        _pageState.TotalCost = InventoryService.UpdateTotalCost();
+        if (_pageState.TotalCost == 0)
         {
-            _pageState.TotalCost = InventoryService.UpdateTotalCost();
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(100);
+            SnackBar.Add("No se ha seleccionado ningún artículo", Severity.Error);
+        }
+        else
+        {
+            _pageState.BuyPressed = true;
         }
     }
 
@@ -125,6 +119,7 @@
         ProductService.UpdateAvailableProducts(availableProducts);
         SnackBar.Add("Compra realizada", Severity.Success);
         ToggleBuyOverlay();
+        _pageState = new ProductIndexState();
         LoadInventory();
     }
 }
